@@ -65,14 +65,11 @@ fn day1_part2_solve(data: &Vec<u64>) -> u64 {
     let mut window = 0;
     let mut previous_window;
 
-    let mut i = 0;
-    while i < 3 {
+    for i in 0..3 {
         window = window + &data[i];
-        i = i + 1;
     }
 
-    let mut i = 0;
-    while i < data.len() - window_size {
+    for i in 0 .. data.len() - window_size {
         previous_window = window;
 
         window = window - &data[i] + &data[i+window_size];
@@ -80,8 +77,6 @@ fn day1_part2_solve(data: &Vec<u64>) -> u64 {
         if window > previous_window {
             counter = counter + 1;
         }
-
-        i = i + 1;
     }
 
     return counter;
