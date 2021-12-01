@@ -27,17 +27,11 @@ fn day1_parse(filename: &str) -> Result<Vec<u64>, ()> {
 }
 
 fn day1_part1_solve(data: &[u64]) -> u64 {
-    let mut iter = data.into_iter();
-
     let mut counter = 0;
-    let mut previous_line: u64 = *iter.next().unwrap();
-
-    for datum in iter {
-        let line = *datum;
-        if line > previous_line {
+    for (prev_line, line) in data.into_iter().zip(data.into_iter().skip(1)) {
+        if line > prev_line {
             counter = counter + 1;
         }
-        previous_line = line;
     }
 
     return counter;
@@ -91,17 +85,11 @@ impl<'a> Iterator for WindowSum<'a> {
 }
 
 fn day1_part2_solve(data: &[u64]) -> u64 {
-    let mut iter = WindowSum::new(data, 3);
-
     let mut counter = 0;
-    let mut previous_line: u64 = iter.next().unwrap();
-
-    for datum in iter {
-        let line = datum;
-        if line > previous_line {
+    for (prev_line, line) in WindowSum::new(data, 3).zip(WindowSum::new(data, 3).skip(1)) {
+        if line > prev_line {
             counter = counter + 1;
         }
-        previous_line = line;
     }
 
     return counter;
@@ -110,8 +98,6 @@ fn day1_part2_solve(data: &[u64]) -> u64 {
 fn main() {
     let filename = "data/day1.txt";
     let data = day1_parse(filename).unwrap();
-
-    //println!("{:?}", data);
 
     let answer = day1_part1_solve(&data);
     println!("{}", answer);
