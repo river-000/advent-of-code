@@ -24,7 +24,7 @@ fn day1_parse(filename: &str) -> Result<Vec<u64>,()> {
     return Ok(v);
 }
 
-fn day1_solve(data: Vec<u64>) -> u64 {
+fn day1_part1_solve(data: &Vec<u64>) -> u64 {
     let mut counter = 0;
     let mut previous_line = data[0];
 
@@ -39,10 +39,63 @@ fn day1_solve(data: Vec<u64>) -> u64 {
     return counter;
 }
 
+/*
+fn day1_part2_solve(data: &Vec<u64>) -> u64 {
+    let window_len = 3;
+
+    let mut counter = 0;
+    let mut previous_window = &data[0..0+window_len];
+
+    let mut i = 1;
+    while (i <= data.len() - window_len) {
+        let window = &data[i..i+window_len];
+        println!("{:?}", window);
+        i = i + 1;
+        previous_window = window;
+    }
+
+    return 0;
+}
+*/
+
+fn day1_part2_solve(data: &Vec<u64>) -> u64 {
+    let mut counter = 0;
+
+    let window_size = 3;
+    let mut window = 0;
+    let mut previous_window;
+
+    let mut i = 0;
+    while i < 3 {
+        window = window + &data[i];
+        i = i + 1;
+    }
+
+    let mut i = 0;
+    while i < data.len() - window_size {
+        previous_window = window;
+
+        window = window - &data[i] + &data[i+window_size];
+
+        if window > previous_window {
+            counter = counter + 1;
+        }
+
+        i = i + 1;
+    }
+
+    return counter;
+}
+
 fn main() {
     let filename = "data/day1.txt";
     let data = day1_parse(filename).unwrap();
+
     //println!("{:?}", data);
-    let answer = day1_solve(data);
+
+    let answer = day1_part1_solve(&data);
+    println!("{}", answer);
+
+    let answer = day1_part2_solve(&data);
     println!("{}", answer);
 }
