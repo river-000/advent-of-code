@@ -24,8 +24,25 @@ fn day1_parse(filename: &str) -> Result<Vec<u64>,()> {
     return Ok(v);
 }
 
+fn day1_solve(data: Vec<u64>) -> u64 {
+    let mut counter = 0;
+    let mut previous_line = data[0];
+
+    for datum in &data[1..] {
+        let line = *datum;
+        if line > previous_line {
+            counter = counter+1;
+        }
+        previous_line = line;
+    }
+
+    return counter;
+}
+
 fn main() {
-    let filename = "data/day1.example.txt";
+    let filename = "data/day1.txt";
     let data = day1_parse(filename).unwrap();
-    println!("{:?}", data);
+    //println!("{:?}", data);
+    let answer = day1_solve(data);
+    println!("{}", answer);
 }
