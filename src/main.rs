@@ -4,12 +4,14 @@ use std::path::Path;
 
 // https://doc.rust-lang.org/rust-by-example/std_misc/file/read_lines.html
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where P: AsRef<Path>, {
+where
+    P: AsRef<Path>,
+{
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
 }
 
-fn day1_parse(filename: &str) -> Result<Vec<u64>,()> {
+fn day1_parse(filename: &str) -> Result<Vec<u64>, ()> {
     let mut v = Vec::new();
 
     if let Ok(lines) = read_lines(filename) {
@@ -24,14 +26,16 @@ fn day1_parse(filename: &str) -> Result<Vec<u64>,()> {
     return Ok(v);
 }
 
-fn day1_part1_solve(data: &Vec<u64>) -> u64 {
-    let mut counter = 0;
-    let mut previous_line = data[0];
+fn day1_part1_solve(data: &[u64]) -> u64 {
+    let mut iter = data.into_iter();
 
-    for datum in &data[1..] {
+    let mut counter = 0;
+    let mut previous_line: u64 = *iter.next().unwrap();
+
+    for datum in iter {
         let line = *datum;
         if line > previous_line {
-            counter = counter+1;
+            counter = counter + 1;
         }
         previous_line = line;
     }
@@ -39,44 +43,65 @@ fn day1_part1_solve(data: &Vec<u64>) -> u64 {
     return counter;
 }
 
-/*
-fn day1_part2_solve(data: &Vec<u64>) -> u64 {
-    let window_len = 3;
-
-    let mut counter = 0;
-    let mut previous_window = &data[0..0+window_len];
-
-    let mut i = 1;
-    while (i <= data.len() - window_len) {
-        let window = &data[i..i+window_len];
-        println!("{:?}", window);
-        i = i + 1;
-        previous_window = window;
-    }
-
-    return 0;
+struct WindowSum<'a> {
+    data: &'a [u64],
+    window_size: usize,
+    window_sum: u64,
+    index: usize,
+    first_element: bool,
 }
-*/
 
-fn day1_part2_solve(data: &Vec<u64>) -> u64 {
-    let mut counter = 0;
+impl<'a> WindowSum<'a> {
+    pub fn new(data: &'a [u64], window_size: usize) -> Self {
+        let mut window_sum = 0;
 
-    let window_size = 3;
-    let mut window = 0;
-    let mut previous_window;
+        for i in 0..window_size {
+            window_sum = window_sum + &data[i];
+        }
 
-    for i in 0..3 {
-        window = window + &data[i];
+        Self {
+            data: data,
+            window_size: window_size,
+            window_sum: window_sum,
+            index: 0,
+            first_element: true,
+        }
     }
+}
 
-    for i in 0 .. data.len() - window_size {
-        previous_window = window;
+impl<'a> Iterator for WindowSum<'a> {
+    type Item = u64;
 
-        window = window - &data[i] + &data[i+window_size];
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.first_element {
+            self.first_element = false;
+            Some(self.window_sum)
+        }
+        else if self.index >= self.data.len() - self.window_size {
+            return None;
+        } else {
+            self.window_sum = self.window_sum - &self.data[self.index]
+                + &self.data[self.index + self.window_size];
 
-        if window > previous_window {
+            self.index = self.index + 1;
+
+            Some(self.window_sum)
+        }
+    }
+}
+
+fn day1_part2_solve(data: &[u64]) -> u64 {
+    let mut iter = WindowSum::new(data, 3);
+
+    let mut counter = 0;
+    let mut previous_line: u64 = iter.next().unwrap();
+
+    for datum in iter {
+        let line = datum;
+        if line > previous_line {
             counter = counter + 1;
         }
+        previous_line = line;
     }
 
     return counter;
