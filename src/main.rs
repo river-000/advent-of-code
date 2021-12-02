@@ -70,8 +70,7 @@ impl<'a> Iterator for WindowSum<'a> {
         if self.first_element {
             self.first_element = false;
             Some(self.window_sum)
-        }
-        else if self.index >= self.data.len() - self.window_size {
+        } else if self.index >= self.data.len() - self.window_size {
             return None;
         } else {
             self.window_sum = self.window_sum - &self.data[self.index]
@@ -95,13 +94,33 @@ fn day1_part2_solve(data: &[u64]) -> u64 {
     return counter;
 }
 
+#[cfg(test)]
+mod tests {
+    use crate::day1_parse;
+    use crate::day1_part1_solve;
+    use crate::day1_part2_solve;
+
+    #[test]
+    fn day1_part1() {
+        let filename = "data/day1.txt";
+        let data = day1_parse(filename).unwrap();
+
+        let answer = day1_part1_solve(&data);
+        println!("{}", answer);
+        assert_eq!(answer, 1553);
+    }
+
+    #[test]
+    fn day1_part2() {
+        let filename = "data/day1.txt";
+        let data = day1_parse(filename).unwrap();
+
+        let answer = day1_part2_solve(&data);
+        println!("{}", answer);
+        assert_eq!(answer, 1597);
+    }
+}
+
 fn main() {
-    let filename = "data/day1.txt";
-    let data = day1_parse(filename).unwrap();
-
-    let answer = day1_part1_solve(&data);
-    println!("{}", answer);
-
-    let answer = day1_part2_solve(&data);
-    println!("{}", answer);
+    println!("hello world!");
 }
