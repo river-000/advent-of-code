@@ -96,7 +96,7 @@ pub fn day2_part1_solve(v: &Vec<Movement>) -> i64 {
         }
     }
 
-    return hori * depth;
+    hori * depth
 }
 
 pub fn day2_part2_solve(v: &Vec<Movement>) -> i64 {
@@ -106,7 +106,7 @@ pub fn day2_part2_solve(v: &Vec<Movement>) -> i64 {
 
     for movement in v {
         match movement {
-            Movement::Down { x } => aim = aim + x,
+            Movement::Down { x } => aim += x,
             Movement::Forward { x } => {
                 hori += x;
                 depth += aim * x;
@@ -114,5 +114,5 @@ pub fn day2_part2_solve(v: &Vec<Movement>) -> i64 {
         }
     }
 
-    return hori * depth;
+    hori * depth
 }
