@@ -34,7 +34,7 @@ fn decimal(input: &str) -> nom::IResult<&str, i64> {
 
     let n = i64::from_str(s).unwrap(); // TODO
 
-    return Ok((i, n));
+    Ok((i, n))
 }
 
 fn parse_forward(i: &str) -> nom::IResult<&str, Movement> {
@@ -42,7 +42,7 @@ fn parse_forward(i: &str) -> nom::IResult<&str, Movement> {
     let (i, _) = nom::character::complete::space1(i)?;
     let (i, n) = decimal(i)?;
 
-    return Ok((i, Movement::Forward { x: n }));
+    Ok((i, Movement::Forward { x: n }))
 }
 
 fn parse_up(i: &str) -> nom::IResult<&str, Movement> {
@@ -50,7 +50,7 @@ fn parse_up(i: &str) -> nom::IResult<&str, Movement> {
     let (i, _) = nom::character::complete::space1(i)?;
     let (i, n) = decimal(i)?;
 
-    return Ok((i, Movement::Down { x: -n }));
+    Ok((i, Movement::Down { x: -n }))
 }
 
 fn parse_down(i: &str) -> nom::IResult<&str, Movement> {
@@ -58,12 +58,12 @@ fn parse_down(i: &str) -> nom::IResult<&str, Movement> {
     let (i, _) = nom::character::complete::space1(i)?;
     let (i, n) = decimal(i)?;
 
-    return Ok((i, Movement::Down { x: n }));
+    Ok((i, Movement::Down { x: n }))
 }
 
 fn parse_command(i: &str) -> nom::IResult<&str, Movement> {
     let (i, r) = nom::branch::alt((parse_forward, parse_up, parse_down))(i)?;
-    return Ok((i, r));
+    Ok((i, r))
 }
 
 pub fn day2_parse(filename: &str) -> Result<Vec<Movement>, ()> {
@@ -80,7 +80,7 @@ pub fn day2_parse(filename: &str) -> Result<Vec<Movement>, ()> {
         }
     }
 
-    return Ok(result);
+    Ok(result)
 }
 
 //
