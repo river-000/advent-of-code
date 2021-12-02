@@ -85,7 +85,7 @@ pub fn day2_parse(filename: &str) -> Result<Vec<Movement>, ()> {
 
 //
 
-pub fn day2_part1_solve(v: &Vec<Movement>) -> i64 {
+pub fn day2_part1_solve(v: &[Movement]) -> i64 {
     let mut hori = 0;
     let mut depth = 0;
 
@@ -99,7 +99,7 @@ pub fn day2_part1_solve(v: &Vec<Movement>) -> i64 {
     hori * depth
 }
 
-pub fn day2_part2_solve(v: &Vec<Movement>) -> i64 {
+pub fn day2_part2_solve(v: &[Movement]) -> i64 {
     let mut hori = 0;
     let mut depth = 0;
     let mut aim = 0;
