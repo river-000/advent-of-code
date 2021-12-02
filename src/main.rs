@@ -35,7 +35,7 @@ mod tests {
 
         let answer = day2::day2_part2_solve(&data);
         println!("{}", answer);
-        assert_eq!(answer, 18178096);
+        assert_eq!(answer, 2134882034);
     }
 }
 
