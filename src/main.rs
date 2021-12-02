@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod day1;
-
+#[cfg(test)]
 mod day2;
 
 #[cfg(test)]
@@ -26,8 +26,6 @@ mod tests {
     fn day2() {
         let filename = "data/day2.txt";
         let data = day2::day2_parse(filename).unwrap();
-
-        //println!("{:?}", data);
 
         let answer = day2::day2_part1_solve(&data);
         println!("{}", answer);

@@ -1,26 +1,23 @@
-use std::fs::File;
-use std::io::Read;
-use std::io::{self, BufRead};
-use std::path::Path;
+use std::io::BufRead;
 use std::str::FromStr;
 
 // https://github.com/Geal/nom/blob/main/doc/choosing_a_combinator.md
-use nom::error::ParseError;
 use nom::{
     character::complete::{char, one_of},
     combinator::recognize,
     multi::{many0, many1},
     sequence::terminated,
-    IResult,
 };
 
 // https://github.com/benkay86/nom-tutorial#alternative-final-parser
 /// Type-erased errors.
+/*
 pub type BoxError = std::boxed::Box<
     dyn std::error::Error // must implement Error to satisfy ?
         + std::marker::Send // needed for threads
         + std::marker::Sync, // needed for threads
 >;
+*/
 
 #[derive(Debug)]
 pub enum Movement {
