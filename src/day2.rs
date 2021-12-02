@@ -24,8 +24,8 @@ pub type BoxError = std::boxed::Box<
 
 #[derive(Debug)]
 pub enum Movement {
-    Forward { n: i64 },
-    Down { n: i64 },
+    Forward { x: i64 },
+    Down { x: i64 },
 }
 
 // https://github.com/Geal/nom/blob/main/doc/nom_recipes.md
@@ -42,7 +42,7 @@ fn parse_forward(i: &str) -> nom::IResult<&str, Movement> {
     let (i, _) = nom::character::complete::space1(i)?;
     let (i, n) = decimal(i)?;
 
-    return Ok((i, Movement::Forward { n: n }));
+    return Ok((i, Movement::Forward { x: n }));
 }
 
 fn parse_up(i: &str) -> nom::IResult<&str, Movement> {
@@ -50,7 +50,7 @@ fn parse_up(i: &str) -> nom::IResult<&str, Movement> {
     let (i, _) = nom::character::complete::space1(i)?;
     let (i, n) = decimal(i)?;
 
-    return Ok((i, Movement::Down { n: -n }));
+    return Ok((i, Movement::Down { x: -n }));
 }
 
 fn parse_down(i: &str) -> nom::IResult<&str, Movement> {
@@ -58,7 +58,7 @@ fn parse_down(i: &str) -> nom::IResult<&str, Movement> {
     let (i, _) = nom::character::complete::space1(i)?;
     let (i, n) = decimal(i)?;
 
-    return Ok((i, Movement::Down { n: n }));
+    return Ok((i, Movement::Down { x: n }));
 }
 
 fn parse_command(i: &str) -> nom::IResult<&str, Movement> {
@@ -85,14 +85,32 @@ pub fn day2_parse(filename: &str) -> Result<Vec<Movement>, ()> {
 
 //
 
-pub fn day2_part1_solve(v: Vec<Movement>) -> i64 {
+pub fn day2_part1_solve(v: &Vec<Movement>) -> i64 {
     let mut hori = 0;
     let mut depth = 0;
 
     for movement in v {
         match movement {
-            Movement::Forward { n } => hori = hori + n,
-            Movement::Down { n } => depth = depth + n,
+            Movement::Forward { x } => hori = hori + x,
+            Movement::Down { x } => depth = depth + x,
+        }
+    }
+
+    return hori * depth;
+}
+
+pub fn day2_part2_solve(v: &Vec<Movement>) -> i64 {
+    let mut hori = 0;
+    let mut depth = 0;
+    let mut aim = 0;
+
+    for movement in v {
+        match movement {
+            Movement::Down { x } => aim = aim + x,
+            Movement::Forward { x } => {
+                hori = hori + x;
+                depth = depth + aim * x;
+            },
         }
     }
 
