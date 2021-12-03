@@ -43,8 +43,8 @@ fn main() {
     let data = day3::day3_parse("data/day3.example.txt").unwrap();
     let answer = day3::day3_part1_solve(&data);
     println!("{:?}", answer);
-    let answer = day3::day3_part2_solve(&data);
-    println!("{:?}", answer);
+    //let answer = day3::day3_part2_solve(&data);
+    //println!("{:?}", answer);
 
     println!("hello world!");
 }

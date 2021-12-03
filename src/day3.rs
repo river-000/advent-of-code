@@ -59,49 +59,27 @@ fn bits_to_number(bits: Vec<bool>) -> u64 {
     w
 }
 
-// https://stackoverflow.com/questions/29530011/creating-a-vector-of-zeros-for-a-specific-size
-fn zeros(size: usize) -> Vec<u64> {
-    let mut zero_vec: Vec<u64> = Vec::with_capacity(size);
-    for i in 0..size {
-        zero_vec.push(0);
-    }
-    return zero_vec;
-}
-
-pub fn day3_part1_helper(input: &Vec<Vec<bool>>) -> (u64, Vec<u64>) {
-    let mut sums = zeros(input[0].len());
-
-    for col in 0..input[0].len() {
-        for row in 0..input.len() {
-            if input[row][col] {
-                sums[col] += 1
-            }
-        }
-    }
-
-    (input.len().try_into().unwrap(), sums)
-}
-
 pub fn day3_part1_solve(input: &Vec<Vec<bool>>) -> u64 {
-    let (cols, sums) = day3_part1_helper(&input);
-
     let mut mcb_result = Vec::new();
     let mut lcb_result = Vec::new();
 
-    for sum in sums {
-        let mcb = 2 * sum >= cols;
+    for col in 0..input[0].len() {
+        let mut zero_bits = 0;
+        let mut one_bits = 0;
 
+        for row in 0..input.len() {
+            if input[row][col] {
+                one_bits += 1
+            }
+            else {
+                zero_bits += 1
+            }
+        }
+
+        let mcb = one_bits > zero_bits;
         mcb_result.push(mcb);
         lcb_result.push(!mcb);
     }
 
     bits_to_number(mcb_result) * bits_to_number(lcb_result)
 }
-
-/*
-pub fn day3_part1_solve(input: &Vec<Vec<bool>>) -> u64 {
-    let (cols, sums) = day3_part1_helper(&input);
-
-
-}
-*/
