@@ -2,11 +2,14 @@
 mod day1;
 #[cfg(test)]
 mod day2;
+#[cfg(test)]
+mod day3;
 
 #[cfg(test)]
 mod tests {
     use crate::day1;
     use crate::day2;
+    use crate::day3;
 
     #[test]
     fn day1() {
@@ -35,18 +38,22 @@ mod tests {
         println!("{}", answer);
         assert_eq!(answer, 2134882034);
     }
-}
 
-mod day3;
+    #[test]
+    fn day3() {
+        let filename = "data/day3.txt";
+        let data = day3::day3_parse(filename).unwrap();
+
+        let answer = day3::day3_part1_solve(&data);
+        println!("{}", answer);
+        assert_eq!(answer, 3374136);
+
+        let answer = day3::day3_part2_solve(&data);
+        println!("{}", answer);
+        assert_eq!(answer, 4432698);
+    }
+}
 
 fn main() {
-    let data = day3::day3_parse("data/day3.example.txt").unwrap();
-    let answer = day3::day3_part1_solve(&data);
-    println!("{:?}", answer);
-    //let answer = day3::day3_part2_solve(&data);
-    //println!("{:?}", answer);
-
     println!("hello world!");
 }
-
-//3374136
