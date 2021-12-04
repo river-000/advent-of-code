@@ -113,3 +113,34 @@ pub fn day2_part2_solve(v: &[Movement]) -> i64 {
 
     hori * depth
 }
+
+//
+
+pub fn day() {
+    let filename = "data/day2.txt";
+    let data = day2_parse(filename).unwrap();
+    let pt1 = day2_part1_solve(&data);
+    let pt2 = day2_part2_solve(&data);
+    println!("{} {}", pt1, pt2);
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::day2::*;
+
+    #[test]
+    pub fn part1() {
+        let filename = "data/day2.txt";
+        let data = day2_parse(filename).unwrap();
+        let answer = day2_part1_solve(&data);
+        assert_eq!(answer, 2272262);
+    }
+
+    #[test]
+    pub fn part2() {
+        let filename = "data/day2.txt";
+        let data = day2_parse(filename).unwrap();
+        let answer = day2_part2_solve(&data);
+        assert_eq!(answer, 2134882034);
+    }
+}

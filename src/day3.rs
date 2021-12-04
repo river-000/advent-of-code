@@ -138,3 +138,34 @@ pub fn day3_part2_solve(input: &Vec<Vec<bool>>) -> u64 {
 
     bits_to_number(&msb_filtered[0]) * bits_to_number(&lsb_filtered[0])
 }
+
+//
+
+pub fn day() {
+    let filename = "data/day3.txt";
+    let data = day3_parse(filename).unwrap();
+    let pt1 = day3_part1_solve(&data);
+    let pt2 = day3_part2_solve(&data);
+    println!("{} {}", pt1, pt2);
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::day3::*;
+
+    #[test]
+    pub fn part1() {
+        let filename = "data/day3.txt";
+        let data = day3_parse(filename).unwrap();
+        let answer = day3_part1_solve(&data);
+        assert_eq!(answer, 3374136);
+    }
+
+    #[test]
+    pub fn part2() {
+        let filename = "data/day3.txt";
+        let data = day3_parse(filename).unwrap();
+        let answer = day3_part2_solve(&data);
+        assert_eq!(answer, 4432698);
+    }
+}

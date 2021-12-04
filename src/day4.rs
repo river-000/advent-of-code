@@ -25,7 +25,7 @@ pub fn parse_day4(i: &str) -> nom::IResult<&str, (Vec<u64>, Vec<Vec<Vec<u64>>>)>
     Ok((i, (ns, gs)))
 }
 
-pub fn parse(filename: &str) -> Result<(Vec<u64>, Vec<Vec<Vec<u64>>>), ()> {
+pub fn day4_parse(filename: &str) -> Result<(Vec<u64>, Vec<Vec<Vec<u64>>>), ()> {
     let text = fs::read_to_string(filename).unwrap();
 
     match parse_day4(&text) {
@@ -106,7 +106,7 @@ fn sum_unmarked_numbers(numbers: &Vec<Vec<u64>>, bits: &Vec<Vec<bool>>) -> u64 {
         .sum::<u64>()
 }
 
-pub fn solve(numbers: &Vec<u64>, grids: &Vec<Vec<Vec<u64>>>) -> u64 {
+pub fn day4_part1_solve((numbers, grids): &(Vec<u64>, Vec<Vec<Vec<u64>>>)) -> u64 {
     let book_reviews: Vec<HashMap<u64, (usize, usize)>> = grids
         .into_iter()
         .map(|g| construct_coordinate_lookup(g))
@@ -122,7 +122,6 @@ pub fn solve(numbers: &Vec<u64>, grids: &Vec<Vec<Vec<u64>>>) -> u64 {
             if let Some((row, col)) = book_review.get(bingo) {
                 bit_grid[*row][*col] = true;
                 if bingo_check(&bit_grid) {
-                    println!("bingo {:?}", bit_grid);
                     return bingo * sum_unmarked_numbers(&grid, &bit_grid);
                 }
             }
@@ -132,7 +131,7 @@ pub fn solve(numbers: &Vec<u64>, grids: &Vec<Vec<Vec<u64>>>) -> u64 {
     return 0;
 }
 
-pub fn solve_pt2(numbers: &Vec<u64>, grids: &Vec<Vec<Vec<u64>>>) -> u64 {
+pub fn day4_part2_solve((numbers, grids): &(Vec<u64>, Vec<Vec<Vec<u64>>>)) -> u64 {
     let book_reviews: Vec<HashMap<u64, (usize, usize)>> = grids
         .into_iter()
         .map(|g| construct_coordinate_lookup(g))
@@ -159,4 +158,35 @@ pub fn solve_pt2(numbers: &Vec<u64>, grids: &Vec<Vec<Vec<u64>>>) -> u64 {
     }
 
     return *answers.last().unwrap();
+}
+
+//
+
+pub fn day() {
+    let filename = "data/day4.txt";
+    let data = day4_parse(filename).unwrap();
+    let pt1 = day4_part1_solve(&data);
+    let pt2 = day4_part2_solve(&data);
+    println!("{} {}", pt1, pt2);
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::day4::*;
+
+    #[test]
+    pub fn part1() {
+        let filename = "data/day4.txt";
+        let data = day4_parse(filename).unwrap();
+        let answer = day4_part1_solve(&data);
+        assert_eq!(answer, 58374);
+    }
+
+    #[test]
+    pub fn part2() {
+        let filename = "data/day4.txt";
+        let data = day4_parse(filename).unwrap();
+        let answer = day4_part2_solve(&data);
+        assert_eq!(answer, 11377);
+    }
 }

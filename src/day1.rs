@@ -93,3 +93,34 @@ pub fn day1_part2_solve(data: &[u64]) -> u64 {
 
     return counter;
 }
+
+//
+
+pub fn day() {
+    let filename = "data/day1.txt";
+    let data = day1_parse(filename).unwrap();
+    let pt1 = day1_part1_solve(&data);
+    let pt2 = day1_part2_solve(&data);
+    println!("{} {}", pt1, pt2);
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::day1::*;
+
+    #[test]
+    pub fn part1() {
+        let filename = "data/day1.txt";
+        let data = day1_parse(filename).unwrap();
+        let answer = day1_part1_solve(&data);
+        assert_eq!(answer, 1553);
+    }
+
+    #[test]
+    pub fn part2() {
+        let filename = "data/day1.txt";
+        let data = day1_parse(filename).unwrap();
+        let answer = day1_part2_solve(&data);
+        assert_eq!(answer, 1597);
+    }
+}
