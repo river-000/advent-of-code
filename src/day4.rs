@@ -3,10 +3,8 @@ use std::fs;
 //use advent_of_code::parse_number;
 use advent_of_code::parse_commasep_numbers;
 use advent_of_code::parse_grid_numbers;
-use advent_of_code::parse_whitespacesep_numbers;
 
 use std::collections::HashMap;
-use std::slice::IterMut;
 
 pub fn parse_day4_grid(i: &str) -> nom::IResult<&str, Vec<Vec<u64>>> {
     let (i, _) = nom::character::complete::newline(i)?;
@@ -117,7 +115,7 @@ pub fn solve(numbers: &Vec<u64>, grids: &Vec<Vec<Vec<u64>>>) -> u64 {
         grids.into_iter().map(|g| construct_bitgrid(g)).collect();
 
     for bingo in numbers {
-        for (grid, (book_review, mut bit_grid)) in grids
+        for (grid, (book_review, bit_grid)) in grids
             .into_iter()
             .zip(book_reviews.iter().zip(bit_grids.iter_mut()))
         {
@@ -145,7 +143,7 @@ pub fn solve_pt2(numbers: &Vec<u64>, grids: &Vec<Vec<Vec<u64>>>) -> u64 {
     let mut answers = Vec::new();
 
     for bingo in numbers {
-        for (grid, (book_review, mut bit_grid)) in grids
+        for (grid, (book_review, bit_grid)) in grids
             .into_iter()
             .zip(book_reviews.iter().zip(bit_grids.iter_mut()))
         {
