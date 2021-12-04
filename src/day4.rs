@@ -31,9 +31,7 @@ pub fn parse(filename: &str) -> Result<(Vec<u64>, Vec<Vec<Vec<u64>>>), ()> {
     let text = fs::read_to_string(filename).unwrap();
 
     match parse_day4(&text) {
-        Ok((_, (ns, gs))) => {
-            Ok((ns, gs))
-        }
+        Ok((_, (ns, gs))) => Ok((ns, gs)),
         Err(_) => Err(()),
     }
 }
@@ -97,23 +95,41 @@ fn bingo_check(g1: &Vec<Vec<bool>>) -> bool {
     false
 }
 
-pub fn solve(numbers: &Vec<u64>, grids: &Vec<Vec<Vec<u64>>>) {
-    let book_reviews = grids.into_iter().map(|g| construct_coordinate_lookup(g));
-    let mut bit_grids = grids.into_iter().map(|g| construct_bitgrid(g));
-    let both = book_reviews.zip(bit_grids);
+fn sum_unmarked_numbers(numbers: &Vec<Vec<u64>>, bits: &Vec<Vec<bool>>) -> u64 {
+    numbers
+        .into_iter()
+        .zip(bits.into_iter())
+        .map(|(a, b)| {
+            a.into_iter()
+                .zip(b.into_iter())
+                .map(|(x, y)| if *y { 0 } else { *x })
+                .sum::<u64>()
+        })
+        .sum::<u64>()
+}
+
+pub fn solve(numbers: &Vec<u64>, grids: &Vec<Vec<Vec<u64>>>) -> u64 {
+    let book_reviews: Vec<HashMap<u64, (usize, usize)>> = grids
+        .into_iter()
+        .map(|g| construct_coordinate_lookup(g))
+        .collect();
+    let mut bit_grids: Vec<Vec<Vec<bool>>> =
+        grids.into_iter().map(|g| construct_bitgrid(g)).collect();
 
     for bingo in numbers {
-        for (book_review, mut bit_grid) in both
+        for (grid, (book_review, mut bit_grid)) in grids
+            .into_iter()
+            .zip(book_reviews.iter().zip(bit_grids.iter_mut()))
         {
             if let Some((row, col)) = book_review.get(bingo) {
                 bit_grid[*row][*col] = true;
                 if bingo_check(&bit_grid) {
                     println!("bingo {:?}", bit_grid);
-                    break;
+                    return bingo * sum_unmarked_numbers(&grid, &bit_grid);
                 }
             }
         }
     }
 
-    //println!("{:?}", book_reviews);
+    return 0;
 }

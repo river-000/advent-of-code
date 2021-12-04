@@ -57,9 +57,10 @@ mod tests {
 mod day4;
 
 fn main() {
-    let filename = "data/day4.example.txt";
+    let filename = "data/day4.txt";
     let (numbers, grids) = day4::parse(filename).unwrap();
-    day4::solve(&numbers, &grids);
+    let answer = day4::solve(&numbers, &grids);
+    println!("{:?}", answer);
 
     println!("hello world!");
 }
