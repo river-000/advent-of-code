@@ -11,13 +11,13 @@ where
     Ok(io::BufReader::new(file).lines())
 }
 
-pub fn day1_parse(filename: &str) -> Result<Vec<u64>, ()> {
+pub fn day1_parse(filename: &str) -> Result<Vec<i64>, ()> {
     let mut v = Vec::new();
 
     if let Ok(lines) = read_lines(filename) {
         for line in lines {
             if let Ok(ip) = line {
-                let my_int: u64 = ip.parse().unwrap();
+                let my_int: i64 = ip.parse().unwrap();
                 v.push(my_int);
             }
         }
@@ -26,7 +26,7 @@ pub fn day1_parse(filename: &str) -> Result<Vec<u64>, ()> {
     return Ok(v);
 }
 
-pub fn day1_part1_solve(data: &[u64]) -> u64 {
+pub fn day1_part1_solve(data: &Vec<i64>) -> i64 {
     let mut counter = 0;
     for (prev_line, line) in data.into_iter().zip(data.into_iter().skip(1)) {
         if line > prev_line {
@@ -38,15 +38,15 @@ pub fn day1_part1_solve(data: &[u64]) -> u64 {
 }
 
 struct WindowSum<'a> {
-    data: &'a [u64],
+    data: &'a Vec<i64>,
     window_size: usize,
-    window_sum: u64,
+    window_sum: i64,
     index: usize,
     first_element: bool,
 }
 
 impl<'a> WindowSum<'a> {
-    pub fn new(data: &'a [u64], window_size: usize) -> Self {
+    pub fn new(data: &'a Vec<i64>, window_size: usize) -> Self {
         let mut window_sum = 0;
 
         for i in 0..window_size {
@@ -64,7 +64,7 @@ impl<'a> WindowSum<'a> {
 }
 
 impl<'a> Iterator for WindowSum<'a> {
-    type Item = u64;
+    type Item = i64;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.first_element {
@@ -83,7 +83,7 @@ impl<'a> Iterator for WindowSum<'a> {
     }
 }
 
-pub fn day1_part2_solve(data: &[u64]) -> u64 {
+pub fn day1_part2_solve(data: &Vec<i64>) -> i64 {
     let mut counter = 0;
     for (prev_line, line) in WindowSum::new(data, 3).zip(WindowSum::new(data, 3).skip(1)) {
         if line > prev_line {
@@ -96,12 +96,14 @@ pub fn day1_part2_solve(data: &[u64]) -> u64 {
 
 //
 
+use advent_of_code::implement_day;
+#[cfg(test)]
+use advent_of_code::implement_test;
+
+const NO: usize = 1;
+
 pub fn day() {
-    let filename = "data/day1.txt";
-    let data = day1_parse(filename).unwrap();
-    let pt1 = day1_part1_solve(&data);
-    let pt2 = day1_part2_solve(&data);
-    println!("{} {}", pt1, pt2);
+    implement_day(NO, "", day1_parse, day1_part1_solve, day1_part2_solve);
 }
 
 #[cfg(test)]
@@ -110,17 +112,11 @@ mod tests {
 
     #[test]
     pub fn part1() {
-        let filename = "data/day1.txt";
-        let data = day1_parse(filename).unwrap();
-        let answer = day1_part1_solve(&data);
-        assert_eq!(answer, 1553);
+        implement_test(NO, "", day1_parse, day1_part1_solve, 1553);
     }
 
     #[test]
     pub fn part2() {
-        let filename = "data/day1.txt";
-        let data = day1_parse(filename).unwrap();
-        let answer = day1_part2_solve(&data);
-        assert_eq!(answer, 1597);
+        implement_test(NO, "", day1_parse, day1_part2_solve, 1597);
     }
 }

@@ -46,7 +46,7 @@ pub fn day3_parse(filename: &str) -> Result<Vec<Vec<bool>>, ()> {
     Ok(result)
 }
 
-fn bits_to_number(bits: &Vec<bool>) -> u64 {
+fn bits_to_number(bits: &Vec<bool>) -> i64 {
     let mut w = 0;
 
     for bit in bits.iter() {
@@ -84,7 +84,7 @@ pub fn day3_part1_helper(input: &Vec<Vec<bool>>) -> (Vec<bool>, Vec<bool>) {
     (mcb_result, lcb_result)
 }
 
-pub fn day3_part1_solve(input: &Vec<Vec<bool>>) -> u64 {
+pub fn day3_part1_solve(input: &Vec<Vec<bool>>) -> i64 {
     let (mcb_result, lcb_result) = day3_part1_helper(&input);
     bits_to_number(&mcb_result) * bits_to_number(&lcb_result)
 }
@@ -103,7 +103,7 @@ fn count_msb_lsb_in_col(input: &Vec<Vec<bool>>, col: usize) -> (bool, bool) {
     (one_bits > zero_bits, one_bits < zero_bits)
 }
 
-pub fn day3_part2_solve(input: &Vec<Vec<bool>>) -> u64 {
+pub fn day3_part2_solve(input: &Vec<Vec<bool>>) -> i64 {
     let num_cols = input[0].len();
     let mut msb_filtered: Vec<Vec<bool>> = input.clone();
     let mut lsb_filtered: Vec<Vec<bool>> = input.clone();
@@ -141,12 +141,14 @@ pub fn day3_part2_solve(input: &Vec<Vec<bool>>) -> u64 {
 
 //
 
+use advent_of_code::implement_day;
+#[cfg(test)]
+use advent_of_code::implement_test;
+
+const NO: usize = 3;
+
 pub fn day() {
-    let filename = "data/day3.txt";
-    let data = day3_parse(filename).unwrap();
-    let pt1 = day3_part1_solve(&data);
-    let pt2 = day3_part2_solve(&data);
-    println!("{} {}", pt1, pt2);
+    implement_day(NO, "", day3_parse, day3_part1_solve, day3_part2_solve);
 }
 
 #[cfg(test)]
@@ -155,17 +157,11 @@ mod tests {
 
     #[test]
     pub fn part1() {
-        let filename = "data/day3.txt";
-        let data = day3_parse(filename).unwrap();
-        let answer = day3_part1_solve(&data);
-        assert_eq!(answer, 3374136);
+        implement_test(NO, "", day3_parse, day3_part1_solve, 3374136);
     }
 
     #[test]
     pub fn part2() {
-        let filename = "data/day3.txt";
-        let data = day3_parse(filename).unwrap();
-        let answer = day3_part2_solve(&data);
-        assert_eq!(answer, 4432698);
+        implement_test(NO, "", day3_parse, day3_part2_solve, 4432698);
     }
 }

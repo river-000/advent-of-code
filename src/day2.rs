@@ -82,7 +82,7 @@ pub fn day2_parse(filename: &str) -> Result<Vec<Movement>, ()> {
 
 //
 
-pub fn day2_part1_solve(v: &[Movement]) -> i64 {
+pub fn day2_part1_solve(v: &Vec<Movement>) -> i64 {
     let mut hori = 0;
     let mut depth = 0;
 
@@ -96,7 +96,7 @@ pub fn day2_part1_solve(v: &[Movement]) -> i64 {
     hori * depth
 }
 
-pub fn day2_part2_solve(v: &[Movement]) -> i64 {
+pub fn day2_part2_solve(v: &Vec<Movement>) -> i64 {
     let mut hori = 0;
     let mut depth = 0;
     let mut aim = 0;
@@ -116,12 +116,14 @@ pub fn day2_part2_solve(v: &[Movement]) -> i64 {
 
 //
 
+use advent_of_code::implement_day;
+#[cfg(test)]
+use advent_of_code::implement_test;
+
+const NO: usize = 2;
+
 pub fn day() {
-    let filename = "data/day2.txt";
-    let data = day2_parse(filename).unwrap();
-    let pt1 = day2_part1_solve(&data);
-    let pt2 = day2_part2_solve(&data);
-    println!("{} {}", pt1, pt2);
+    implement_day(NO, "", day2_parse, day2_part1_solve, day2_part2_solve);
 }
 
 #[cfg(test)]
@@ -130,17 +132,11 @@ mod tests {
 
     #[test]
     pub fn part1() {
-        let filename = "data/day2.txt";
-        let data = day2_parse(filename).unwrap();
-        let answer = day2_part1_solve(&data);
-        assert_eq!(answer, 2272262);
+        implement_test(NO, "", day2_parse, day2_part1_solve, 2272262);
     }
 
     #[test]
     pub fn part2() {
-        let filename = "data/day2.txt";
-        let data = day2_parse(filename).unwrap();
-        let answer = day2_part2_solve(&data);
-        assert_eq!(answer, 2134882034);
+        implement_test(NO, "", day2_parse, day2_part2_solve, 2134882034);
     }
 }

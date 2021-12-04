@@ -6,7 +6,7 @@ use advent_of_code::parse_grid_numbers;
 
 use std::collections::HashMap;
 
-pub fn parse_day4_grid(i: &str) -> nom::IResult<&str, Vec<Vec<u64>>> {
+pub fn parse_day4_grid(i: &str) -> nom::IResult<&str, Vec<Vec<i64>>> {
     let (i, _) = nom::character::complete::newline(i)?;
     let (i, _) = nom::character::complete::newline(i)?;
     let (i, g) = parse_grid_numbers(i)?;
@@ -14,18 +14,18 @@ pub fn parse_day4_grid(i: &str) -> nom::IResult<&str, Vec<Vec<u64>>> {
     Ok((i, g))
 }
 
-pub fn parse_day4_grids(i: &str) -> nom::IResult<&str, Vec<Vec<Vec<u64>>>> {
+pub fn parse_day4_grids(i: &str) -> nom::IResult<&str, Vec<Vec<Vec<i64>>>> {
     nom::multi::many1(parse_day4_grid)(i)
 }
 
-pub fn parse_day4(i: &str) -> nom::IResult<&str, (Vec<u64>, Vec<Vec<Vec<u64>>>)> {
+pub fn parse_day4(i: &str) -> nom::IResult<&str, (Vec<i64>, Vec<Vec<Vec<i64>>>)> {
     let (i, ns) = parse_commasep_numbers(i)?;
     let (i, gs) = parse_day4_grids(i)?;
 
     Ok((i, (ns, gs)))
 }
 
-pub fn day4_parse(filename: &str) -> Result<(Vec<u64>, Vec<Vec<Vec<u64>>>), ()> {
+pub fn day4_parse(filename: &str) -> Result<(Vec<i64>, Vec<Vec<Vec<i64>>>), ()> {
     let text = fs::read_to_string(filename).unwrap();
 
     match parse_day4(&text) {
@@ -34,7 +34,7 @@ pub fn day4_parse(filename: &str) -> Result<(Vec<u64>, Vec<Vec<Vec<u64>>>), ()> 
     }
 }
 
-fn construct_coordinate_lookup(g1: &Vec<Vec<u64>>) -> HashMap<u64, (usize, usize)> {
+fn construct_coordinate_lookup(g1: &Vec<Vec<i64>>) -> HashMap<i64, (usize, usize)> {
     let mut book_reviews = HashMap::new();
 
     for row in 0..g1.len() {
@@ -47,7 +47,7 @@ fn construct_coordinate_lookup(g1: &Vec<Vec<u64>>) -> HashMap<u64, (usize, usize
     book_reviews
 }
 
-fn construct_bitgrid(g1: &Vec<Vec<u64>>) -> Vec<Vec<bool>> {
+fn construct_bitgrid(g1: &Vec<Vec<i64>>) -> Vec<Vec<bool>> {
     let mut bitgrid = Vec::new();
 
     for _ in 0..g1.len() {
@@ -93,7 +93,7 @@ fn bingo_check(g1: &Vec<Vec<bool>>) -> bool {
     false
 }
 
-fn sum_unmarked_numbers(numbers: &Vec<Vec<u64>>, bits: &Vec<Vec<bool>>) -> u64 {
+fn sum_unmarked_numbers(numbers: &Vec<Vec<i64>>, bits: &Vec<Vec<bool>>) -> i64 {
     numbers
         .into_iter()
         .zip(bits.into_iter())
@@ -101,13 +101,13 @@ fn sum_unmarked_numbers(numbers: &Vec<Vec<u64>>, bits: &Vec<Vec<bool>>) -> u64 {
             a.into_iter()
                 .zip(b.into_iter())
                 .map(|(x, y)| if *y { 0 } else { *x })
-                .sum::<u64>()
+                .sum::<i64>()
         })
-        .sum::<u64>()
+        .sum::<i64>()
 }
 
-pub fn day4_part1_solve((numbers, grids): &(Vec<u64>, Vec<Vec<Vec<u64>>>)) -> u64 {
-    let book_reviews: Vec<HashMap<u64, (usize, usize)>> = grids
+pub fn day4_part1_solve((numbers, grids): &(Vec<i64>, Vec<Vec<Vec<i64>>>)) -> i64 {
+    let book_reviews: Vec<HashMap<i64, (usize, usize)>> = grids
         .into_iter()
         .map(|g| construct_coordinate_lookup(g))
         .collect();
@@ -131,8 +131,8 @@ pub fn day4_part1_solve((numbers, grids): &(Vec<u64>, Vec<Vec<Vec<u64>>>)) -> u6
     return 0;
 }
 
-pub fn day4_part2_solve((numbers, grids): &(Vec<u64>, Vec<Vec<Vec<u64>>>)) -> u64 {
-    let book_reviews: Vec<HashMap<u64, (usize, usize)>> = grids
+pub fn day4_part2_solve((numbers, grids): &(Vec<i64>, Vec<Vec<Vec<i64>>>)) -> i64 {
+    let book_reviews: Vec<HashMap<i64, (usize, usize)>> = grids
         .into_iter()
         .map(|g| construct_coordinate_lookup(g))
         .collect();
@@ -162,12 +162,14 @@ pub fn day4_part2_solve((numbers, grids): &(Vec<u64>, Vec<Vec<Vec<u64>>>)) -> u6
 
 //
 
+use advent_of_code::implement_day;
+#[cfg(test)]
+use advent_of_code::implement_test;
+
+const NO: usize = 4;
+
 pub fn day() {
-    let filename = "data/day4.txt";
-    let data = day4_parse(filename).unwrap();
-    let pt1 = day4_part1_solve(&data);
-    let pt2 = day4_part2_solve(&data);
-    println!("{} {}", pt1, pt2);
+    implement_day(NO, "", day4_parse, day4_part1_solve, day4_part2_solve);
 }
 
 #[cfg(test)]
@@ -176,17 +178,11 @@ mod tests {
 
     #[test]
     pub fn part1() {
-        let filename = "data/day4.txt";
-        let data = day4_parse(filename).unwrap();
-        let answer = day4_part1_solve(&data);
-        assert_eq!(answer, 58374);
+        implement_test(NO, "", day4_parse, day4_part1_solve, 58374);
     }
 
     #[test]
     pub fn part2() {
-        let filename = "data/day4.txt";
-        let data = day4_parse(filename).unwrap();
-        let answer = day4_part2_solve(&data);
-        assert_eq!(answer, 11377);
+        implement_test(NO, "", day4_parse, day4_part2_solve, 11377);
     }
 }
