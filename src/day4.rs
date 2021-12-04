@@ -6,7 +6,9 @@ use advent_of_code::parse_grid_numbers;
 
 use std::collections::HashMap;
 
-pub fn parse_day4_grid(i: &str) -> nom::IResult<&str, Vec<Vec<i64>>> {
+type Grid<T> = Vec<Vec<T>>;
+
+pub fn parse_day4_grid(i: &str) -> nom::IResult<&str,Grid<i64>> {
     let (i, _) = nom::character::complete::newline(i)?;
     let (i, _) = nom::character::complete::newline(i)?;
     let (i, g) = parse_grid_numbers(i)?;
@@ -14,18 +16,18 @@ pub fn parse_day4_grid(i: &str) -> nom::IResult<&str, Vec<Vec<i64>>> {
     Ok((i, g))
 }
 
-pub fn parse_day4_grids(i: &str) -> nom::IResult<&str, Vec<Vec<Vec<i64>>>> {
+pub fn parse_day4_grids(i: &str) -> nom::IResult<&str, Vec<Grid<i64>>> {
     nom::multi::many1(parse_day4_grid)(i)
 }
 
-pub fn parse_day4(i: &str) -> nom::IResult<&str, (Vec<i64>, Vec<Vec<Vec<i64>>>)> {
+pub fn parse_day4(i: &str) -> nom::IResult<&str, (Vec<i64>, Vec<Grid<i64>>)> {
     let (i, ns) = parse_commasep_numbers(i)?;
     let (i, gs) = parse_day4_grids(i)?;
 
     Ok((i, (ns, gs)))
 }
 
-pub fn day4_parse(filename: &str) -> Result<(Vec<i64>, Vec<Vec<Vec<i64>>>), ()> {
+pub fn day4_parse(filename: &str) -> Result<(Vec<i64>, Vec<Grid<i64>>), ()> {
     let text = fs::read_to_string(filename).unwrap();
 
     match parse_day4(&text) {
@@ -47,7 +49,7 @@ fn construct_coordinate_lookup(g1: &Vec<Vec<i64>>) -> HashMap<i64, (usize, usize
     book_reviews
 }
 
-fn construct_bitgrid(g1: &Vec<Vec<i64>>) -> Vec<Vec<bool>> {
+fn construct_bitgrid(g1: &Grid<i64>) -> Grid<bool> {
     let mut bitgrid = Vec::new();
 
     for _ in 0..g1.len() {
@@ -61,7 +63,7 @@ fn construct_bitgrid(g1: &Vec<Vec<i64>>) -> Vec<Vec<bool>> {
     bitgrid
 }
 
-fn bingo_check(g1: &Vec<Vec<bool>>) -> bool {
+fn bingo_check(g1: &Grid<bool>) -> bool {
     // cols
     for row in 0..g1.len() {
         let mut ok = true;
@@ -93,7 +95,7 @@ fn bingo_check(g1: &Vec<Vec<bool>>) -> bool {
     false
 }
 
-fn sum_unmarked_numbers(numbers: &Vec<Vec<i64>>, bits: &Vec<Vec<bool>>) -> i64 {
+fn sum_unmarked_numbers(numbers: &Grid<i64>, bits: &Grid<bool>) -> i64 {
     numbers
         .into_iter()
         .zip(bits.into_iter())
@@ -106,7 +108,7 @@ fn sum_unmarked_numbers(numbers: &Vec<Vec<i64>>, bits: &Vec<Vec<bool>>) -> i64 {
         .sum::<i64>()
 }
 
-pub fn day4_helper((numbers, grids): &(Vec<i64>, Vec<Vec<Vec<i64>>>)) -> Vec<i64> {
+pub fn day4_helper((numbers, grids): &(Vec<i64>, Vec<Grid<i64>>)) -> Vec<i64> {
     let book_reviews: Vec<HashMap<i64, (usize, usize)>> = grids
         .into_iter()
         .map(|g| construct_coordinate_lookup(g))
@@ -136,11 +138,11 @@ pub fn day4_helper((numbers, grids): &(Vec<i64>, Vec<Vec<Vec<i64>>>)) -> Vec<i64
 }
 
 
-pub fn day4_part1_solve(input: &(Vec<i64>, Vec<Vec<Vec<i64>>>)) -> i64 {
+pub fn day4_part1_solve(input: &(Vec<i64>, Vec<Grid<i64>>)) -> i64 {
     day4_helper(input)[0]
 }
 
-pub fn day4_part2_solve(input: &(Vec<i64>, Vec<Vec<Vec<i64>>>)) -> i64 {
+pub fn day4_part2_solve(input: &(Vec<i64>, Vec<Grid<i64>>)) -> i64 {
     *day4_helper(input).last().unwrap()
 }
 
