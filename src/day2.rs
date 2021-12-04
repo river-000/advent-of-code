@@ -9,16 +9,6 @@ use nom::{
     sequence::terminated,
 };
 
-// https://github.com/benkay86/nom-tutorial#alternative-final-parser
-/// Type-erased errors.
-/*
-pub type BoxError = std::boxed::Box<
-    dyn std::error::Error // must implement Error to satisfy ?
-        + std::marker::Send // needed for threads
-        + std::marker::Sync, // needed for threads
->;
-*/
-
 #[derive(Debug)]
 pub enum Movement {
     Forward { x: i64 },

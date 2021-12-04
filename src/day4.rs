@@ -106,32 +106,7 @@ fn sum_unmarked_numbers(numbers: &Vec<Vec<i64>>, bits: &Vec<Vec<bool>>) -> i64 {
         .sum::<i64>()
 }
 
-pub fn day4_part1_solve((numbers, grids): &(Vec<i64>, Vec<Vec<Vec<i64>>>)) -> i64 {
-    let book_reviews: Vec<HashMap<i64, (usize, usize)>> = grids
-        .into_iter()
-        .map(|g| construct_coordinate_lookup(g))
-        .collect();
-    let mut bit_grids: Vec<Vec<Vec<bool>>> =
-        grids.into_iter().map(|g| construct_bitgrid(g)).collect();
-
-    for bingo in numbers {
-        for (grid, (book_review, bit_grid)) in grids
-            .into_iter()
-            .zip(book_reviews.iter().zip(bit_grids.iter_mut()))
-        {
-            if let Some((row, col)) = book_review.get(bingo) {
-                bit_grid[*row][*col] = true;
-                if bingo_check(&bit_grid) {
-                    return bingo * sum_unmarked_numbers(&grid, &bit_grid);
-                }
-            }
-        }
-    }
-
-    return 0;
-}
-
-pub fn day4_part2_solve((numbers, grids): &(Vec<i64>, Vec<Vec<Vec<i64>>>)) -> i64 {
+pub fn day4_helper((numbers, grids): &(Vec<i64>, Vec<Vec<Vec<i64>>>)) -> Vec<i64> {
     let book_reviews: Vec<HashMap<i64, (usize, usize)>> = grids
         .into_iter()
         .map(|g| construct_coordinate_lookup(g))
@@ -157,7 +132,16 @@ pub fn day4_part2_solve((numbers, grids): &(Vec<i64>, Vec<Vec<Vec<i64>>>)) -> i6
         }
     }
 
-    return *answers.last().unwrap();
+    return answers;
+}
+
+
+pub fn day4_part1_solve(input: &(Vec<i64>, Vec<Vec<Vec<i64>>>)) -> i64 {
+    day4_helper(input)[0]
+}
+
+pub fn day4_part2_solve(input: &(Vec<i64>, Vec<Vec<Vec<i64>>>)) -> i64 {
+    *day4_helper(input).last().unwrap()
 }
 
 //

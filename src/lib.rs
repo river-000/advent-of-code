@@ -1,3 +1,7 @@
+use std::fs::File;
+use std::io::{self, BufRead};
+use std::path::Path;
+
 fn filename(no: usize, example: &str) -> String {
   format!("data/day{}{}.txt", no, example)
 }
@@ -17,23 +21,18 @@ pub fn implement_test<T>(no: usize, example: &str, parse: fn(&str) -> Result<T, 
   assert_eq!(answer, expect);
 }
 
-// https://docs.rs/nom/latest/nom/
-/*
-fn from_hex(input: &str) -> Result<u8, std::num::ParseIntError> {
-  u8::from_str_radix(input, 16)
+
+// https://doc.rust-lang.org/rust-by-example/std_misc/file/read_lines.html
+pub fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
+where
+    P: AsRef<Path>,
+{
+    let file = File::open(filename)?;
+    Ok(io::BufReader::new(file).lines())
 }
 
-fn is_hex_digit(c: char) -> bool {
-  c.is_digit(16)
-}
 
-fn hex_primary(input: &str) -> IResult<&str, u8> {
-  map_res(
-    take_while_m_n(2, 2, is_hex_digit),
-    from_hex
-  )(input)
-}
-*/
+// nom
 
 // function to parse a number (not in nom???)
 pub fn parse_number(i: &str) -> nom::IResult<&str, i64> {
