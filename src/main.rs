@@ -61,6 +61,8 @@ fn main() {
     let (numbers, grids) = day4::parse(filename).unwrap();
     let answer = day4::solve(&numbers, &grids);
     println!("{:?}", answer);
+    let answer = day4::solve_pt2(&numbers, &grids);
+    println!("{:?}", answer);
 
     println!("hello world!");
 }

@@ -133,3 +133,32 @@ pub fn solve(numbers: &Vec<u64>, grids: &Vec<Vec<Vec<u64>>>) -> u64 {
 
     return 0;
 }
+
+pub fn solve_pt2(numbers: &Vec<u64>, grids: &Vec<Vec<Vec<u64>>>) -> u64 {
+    let book_reviews: Vec<HashMap<u64, (usize, usize)>> = grids
+        .into_iter()
+        .map(|g| construct_coordinate_lookup(g))
+        .collect();
+    let mut bit_grids: Vec<Vec<Vec<bool>>> =
+        grids.into_iter().map(|g| construct_bitgrid(g)).collect();
+    
+    let mut answers = Vec::new();
+
+    for bingo in numbers {
+        for (grid, (book_review, mut bit_grid)) in grids
+            .into_iter()
+            .zip(book_reviews.iter().zip(bit_grids.iter_mut()))
+        {
+            if !bingo_check(&bit_grid) {
+                if let Some((row, col)) = book_review.get(bingo) {
+                    bit_grid[*row][*col] = true;
+                    if bingo_check(&bit_grid) {
+                        answers.push(bingo * sum_unmarked_numbers(&grid, &bit_grid));
+                    }
+                }
+            }
+        }
+    }
+
+    return *answers.last().unwrap();
+}
