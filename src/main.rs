@@ -54,6 +54,12 @@ mod tests {
     }
 }
 
+mod day4;
+
 fn main() {
+    let filename = "data/day4.example.txt";
+    let data = day4::parse(filename).unwrap();
+    println!("{:?}", data);
+
     println!("hello world!");
 }
