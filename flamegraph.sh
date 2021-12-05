@@ -1,3 +1,3 @@
 #!/bin/sh
 cargo install --path .
-~/.cargo/bin/flamegraph -o my_flamegraph.svg ./target/release/advent-of-code
+~/.cargo/bin/flamegraph -F 10000 -o my_flamegraph.svg ./target/release/advent-of-code
