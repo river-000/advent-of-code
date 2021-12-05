@@ -27,7 +27,7 @@ pub fn parse_day4(i: &str) -> nom::IResult<&str, (Vec<i64>, Vec<Grid<i64>>)> {
     Ok((i, (ns, gs)))
 }
 
-pub fn day4_parse(filename: &str) -> Result<(Vec<i64>, Vec<Grid<i64>>), ()> {
+pub fn parse(filename: &str) -> Result<(Vec<i64>, Vec<Grid<i64>>), ()> {
     let text = fs::read_to_string(filename).unwrap();
 
     match parse_day4(&text) {
@@ -138,11 +138,11 @@ pub fn day4_helper((numbers, grids): &(Vec<i64>, Vec<Grid<i64>>)) -> Vec<i64> {
 }
 
 
-pub fn day4_part1_solve(input: &(Vec<i64>, Vec<Grid<i64>>)) -> i64 {
+pub fn part1_solve(input: &(Vec<i64>, Vec<Grid<i64>>)) -> i64 {
     day4_helper(input)[0]
 }
 
-pub fn day4_part2_solve(input: &(Vec<i64>, Vec<Grid<i64>>)) -> i64 {
+pub fn part2_solve(input: &(Vec<i64>, Vec<Grid<i64>>)) -> i64 {
     *day4_helper(input).last().unwrap()
 }
 
@@ -155,7 +155,7 @@ use advent_of_code::implement_test;
 const NO: usize = 4;
 
 pub fn day() {
-    implement_day(NO, "", day4_parse, day4_part1_solve, day4_part2_solve);
+    implement_day(NO, "", parse, part1_solve, part2_solve);
 }
 
 #[cfg(test)]
@@ -164,11 +164,11 @@ mod tests {
 
     #[test]
     pub fn part1() {
-        implement_test(NO, "", day4_parse, day4_part1_solve, 58374);
+        implement_test(NO, "", parse, part1_solve, 58374);
     }
 
     #[test]
     pub fn part2() {
-        implement_test(NO, "", day4_parse, day4_part2_solve, 11377);
+        implement_test(NO, "", parse, part2_solve, 11377);
     }
 }

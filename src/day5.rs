@@ -27,7 +27,7 @@ fn parse_line(i: &str) -> nom::IResult<&str, Line> {
     Ok((i, Line { from: a, to: b }))
 }
 
-pub fn day5_parse(filename: &str) -> Result<Vec<Line>, ()> {
+pub fn parse(filename: &str) -> Result<Vec<Line>, ()> {
     let mut result = Vec::new();
 
     if let Ok(lines) = read_lines(filename) {
@@ -56,9 +56,9 @@ const NO: usize = 5;
 
 pub fn day() {
     let name = advent_of_code::filename(NO, ".example");
-    let data = day5_parse(&name).unwrap();
+    let data = parse(&name).unwrap();
     println!("{:?}", data)
-    //implement_day(NO, "", day5_parse, day5_part1_solve, day5_part2_solve);
+    //implement_day(NO, "", parse, part1_solve, part2_solve);
 }
 
 /*
@@ -68,12 +68,12 @@ mod tests {
 
     #[test]
     pub fn part1() {
-        implement_test(NO, "", day5_parse, day5_part1_solve, 3374136);
+        implement_test(NO, "", parse, part1_solve, 3374136);
     }
 
     #[test]
     pub fn part2() {
-        implement_test(NO, "", day5_parse, day5_part2_solve, 4432698);
+        implement_test(NO, "", parse, part2_solve, 4432698);
     }
 }
 */

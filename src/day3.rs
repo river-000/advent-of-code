@@ -20,7 +20,7 @@ fn parse_command(i: &str) -> nom::IResult<&str, Vec<bool>> {
     Ok((i, r))
 }
 
-pub fn day3_parse(filename: &str) -> Result<Vec<Vec<bool>>, ()> {
+pub fn parse(filename: &str) -> Result<Vec<Vec<bool>>, ()> {
     let mut result = Vec::new();
 
     if let Ok(lines) = read_lines(filename) {
@@ -77,7 +77,7 @@ pub fn day3_part1_helper(input: &Vec<Vec<bool>>) -> (Vec<bool>, Vec<bool>) {
     (mcb_result, lcb_result)
 }
 
-pub fn day3_part1_solve(input: &Vec<Vec<bool>>) -> i64 {
+pub fn part1_solve(input: &Vec<Vec<bool>>) -> i64 {
     let (mcb_result, lcb_result) = day3_part1_helper(&input);
     bits_to_number(&mcb_result) * bits_to_number(&lcb_result)
 }
@@ -96,7 +96,7 @@ fn count_msb_lsb_in_col(input: &Vec<Vec<bool>>, col: usize) -> (bool, bool) {
     (one_bits > zero_bits, one_bits < zero_bits)
 }
 
-pub fn day3_part2_solve(input: &Vec<Vec<bool>>) -> i64 {
+pub fn part2_solve(input: &Vec<Vec<bool>>) -> i64 {
     let num_cols = input[0].len();
     let mut msb_filtered: Vec<Vec<bool>> = input.clone();
     let mut lsb_filtered: Vec<Vec<bool>> = input.clone();
@@ -141,7 +141,7 @@ use advent_of_code::implement_test;
 const NO: usize = 3;
 
 pub fn day() {
-    implement_day(NO, "", day3_parse, day3_part1_solve, day3_part2_solve);
+    implement_day(NO, "", parse, part1_solve, part2_solve);
 }
 
 #[cfg(test)]
@@ -150,11 +150,11 @@ mod tests {
 
     #[test]
     pub fn part1() {
-        implement_test(NO, "", day3_parse, day3_part1_solve, 3374136);
+        implement_test(NO, "", parse, part1_solve, 3374136);
     }
 
     #[test]
     pub fn part2() {
-        implement_test(NO, "", day3_parse, day3_part2_solve, 4432698);
+        implement_test(NO, "", parse, part2_solve, 4432698);
     }
 }

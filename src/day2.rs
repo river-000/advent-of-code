@@ -45,7 +45,7 @@ fn parse_command(i: &str) -> nom::IResult<&str, Movement> {
     Ok((i, r))
 }
 
-pub fn day2_parse(filename: &str) -> Result<Vec<Movement>, ()> {
+pub fn parse(filename: &str) -> Result<Vec<Movement>, ()> {
     let mut result: Vec<Movement> = Vec::new();
 
     let file = std::fs::File::open(filename).unwrap();
@@ -64,7 +64,7 @@ pub fn day2_parse(filename: &str) -> Result<Vec<Movement>, ()> {
 
 //
 
-pub fn day2_part1_solve(v: &Vec<Movement>) -> i64 {
+pub fn part1_solve(v: &Vec<Movement>) -> i64 {
     let mut hori = 0;
     let mut depth = 0;
 
@@ -78,7 +78,7 @@ pub fn day2_part1_solve(v: &Vec<Movement>) -> i64 {
     hori * depth
 }
 
-pub fn day2_part2_solve(v: &Vec<Movement>) -> i64 {
+pub fn part2_solve(v: &Vec<Movement>) -> i64 {
     let mut hori = 0;
     let mut depth = 0;
     let mut aim = 0;
@@ -105,7 +105,7 @@ use advent_of_code::implement_test;
 const NO: usize = 2;
 
 pub fn day() {
-    implement_day(NO, "", day2_parse, day2_part1_solve, day2_part2_solve);
+    implement_day(NO, "", parse, part1_solve, part2_solve);
 }
 
 #[cfg(test)]
@@ -114,11 +114,11 @@ mod tests {
 
     #[test]
     pub fn part1() {
-        implement_test(NO, "", day2_parse, day2_part1_solve, 2272262);
+        implement_test(NO, "", parse, part1_solve, 2272262);
     }
 
     #[test]
     pub fn part2() {
-        implement_test(NO, "", day2_parse, day2_part2_solve, 2134882034);
+        implement_test(NO, "", parse, part2_solve, 2134882034);
     }
 }

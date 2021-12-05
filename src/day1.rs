@@ -1,7 +1,7 @@
 
 use advent_of_code::read_lines;
 
-pub fn day1_parse(filename: &str) -> Result<Vec<i64>, ()> {
+pub fn parse(filename: &str) -> Result<Vec<i64>, ()> {
     let mut v = Vec::new();
 
     if let Ok(lines) = read_lines(filename) {
@@ -16,7 +16,7 @@ pub fn day1_parse(filename: &str) -> Result<Vec<i64>, ()> {
     return Ok(v);
 }
 
-pub fn day1_part1_solve(data: &Vec<i64>) -> i64 {
+pub fn part1_solve(data: &Vec<i64>) -> i64 {
     let mut counter = 0;
     for (prev_line, line) in data.into_iter().zip(data.into_iter().skip(1)) {
         if line > prev_line {
@@ -73,7 +73,7 @@ impl<'a> Iterator for WindowSum<'a> {
     }
 }
 
-pub fn day1_part2_solve(data: &Vec<i64>) -> i64 {
+pub fn part2_solve(data: &Vec<i64>) -> i64 {
     let mut counter = 0;
     for (prev_line, line) in WindowSum::new(data, 3).zip(WindowSum::new(data, 3).skip(1)) {
         if line > prev_line {
@@ -93,7 +93,7 @@ use advent_of_code::implement_test;
 const NO: usize = 1;
 
 pub fn day() {
-    implement_day(NO, "", day1_parse, day1_part1_solve, day1_part2_solve);
+    implement_day(NO, "", parse, part1_solve, part2_solve);
 }
 
 #[cfg(test)]
@@ -102,11 +102,11 @@ mod tests {
 
     #[test]
     pub fn part1() {
-        implement_test(NO, "", day1_parse, day1_part1_solve, 1553);
+        implement_test(NO, "", parse, part1_solve, 1553);
     }
 
     #[test]
     pub fn part2() {
-        implement_test(NO, "", day1_parse, day1_part2_solve, 1597);
+        implement_test(NO, "", parse, part2_solve, 1597);
     }
 }
