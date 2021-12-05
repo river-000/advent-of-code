@@ -4,7 +4,7 @@ mod day3;
 mod day4;
 mod day5;
 
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::SystemTime;
 
 fn time_it(f: fn() -> ()) {
     let start = SystemTime::now();

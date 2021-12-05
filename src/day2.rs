@@ -1,14 +1,5 @@
 use std::io::BufRead;
-use std::str::FromStr;
 use advent_of_code::parse_number;
-
-// https://github.com/Geal/nom/blob/main/doc/choosing_a_combinator.md
-use nom::{
-    character::complete::{char, one_of},
-    combinator::recognize,
-    multi::{many0, many1},
-    sequence::terminated,
-};
 
 #[derive(Debug)]
 pub enum Movement {

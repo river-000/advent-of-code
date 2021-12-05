@@ -2,7 +2,6 @@ use advent_of_code::parse_number;
 use advent_of_code::read_lines;
 use std::collections::HashMap;
 use std::hash::Hash;
-use std::io::{self, BufRead};
 
 #[derive(Debug)]
 pub struct Line {
@@ -109,10 +108,13 @@ fn map_increment<K>(m: &mut HashMap<K, i64>, k: K) -> ()
 where
     K: Hash + Eq,
 {
+    *m.entry(k).or_default() += 1
+    /*
     match m.get(&k) {
         None => m.insert(k, 1),
         Some(x) => m.insert(k, x + 1),
     };
+    */
 }
 
 fn solve_part1(lines: &Vec<Line>) -> i64 {

@@ -1,7 +1,3 @@
-//use std::fs::File;
-use std::io::{self, BufRead};
-//use std::path::Path;
-
 use advent_of_code::read_lines;
 
 // parse a vector of bits
