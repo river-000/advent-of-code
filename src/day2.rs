@@ -1,5 +1,6 @@
 use std::io::BufRead;
 use std::str::FromStr;
+use advent_of_code::parse_number;
 
 // https://github.com/Geal/nom/blob/main/doc/choosing_a_combinator.md
 use nom::{
@@ -15,19 +16,10 @@ pub enum Movement {
     Down { x: i64 },
 }
 
-// https://github.com/Geal/nom/blob/main/doc/nom_recipes.md
-fn decimal(input: &str) -> nom::IResult<&str, i64> {
-    let (i, s) = recognize(many1(terminated(one_of("0123456789"), many0(char('_')))))(input)?;
-
-    let n = i64::from_str(s).unwrap(); // TODO
-
-    Ok((i, n))
-}
-
 fn parse_forward(i: &str) -> nom::IResult<&str, Movement> {
     let (i, _) = nom::bytes::complete::tag("forward")(i)?;
     let (i, _) = nom::character::complete::space1(i)?;
-    let (i, n) = decimal(i)?;
+    let (i, n) = parse_number(i)?;
 
     Ok((i, Movement::Forward { x: n }))
 }
@@ -35,7 +27,7 @@ fn parse_forward(i: &str) -> nom::IResult<&str, Movement> {
 fn parse_up(i: &str) -> nom::IResult<&str, Movement> {
     let (i, _) = nom::bytes::complete::tag("up")(i)?;
     let (i, _) = nom::character::complete::space1(i)?;
-    let (i, n) = decimal(i)?;
+    let (i, n) = parse_number(i)?;
 
     Ok((i, Movement::Down { x: -n }))
 }
@@ -43,7 +35,7 @@ fn parse_up(i: &str) -> nom::IResult<&str, Movement> {
 fn parse_down(i: &str) -> nom::IResult<&str, Movement> {
     let (i, _) = nom::bytes::complete::tag("down")(i)?;
     let (i, _) = nom::character::complete::space1(i)?;
-    let (i, n) = decimal(i)?;
+    let (i, n) = parse_number(i)?;
 
     Ok((i, Movement::Down { x: n }))
 }

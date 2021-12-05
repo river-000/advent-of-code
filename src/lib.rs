@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
-fn filename(no: usize, example: &str) -> String {
+pub fn filename(no: usize, example: &str) -> String {
   format!("data/day{}{}.txt", no, example)
 }
 
@@ -40,6 +40,17 @@ pub fn parse_number(i: &str) -> nom::IResult<&str, i64> {
     let n = i64::from_str_radix(s, 10).unwrap();
     Ok((i, n))
 }
+
+/*
+// https://github.com/Geal/nom/blob/main/doc/nom_recipes.md
+fn decimal(input: &str) -> nom::IResult<&str, i64> {
+  let (i, s) = recognize(many1(terminated(one_of("0123456789"), many0(char('_')))))(input)?;
+
+  let n = i64::from_str(s).unwrap(); // TODO
+
+  Ok((i, n))
+}
+*/
 
 pub fn parse_commasep_numbers(i: &str) -> nom::IResult<&str, Vec<i64>> {
   nom::multi::separated_list1(nom::bytes::complete::tag(","), parse_number)(i)

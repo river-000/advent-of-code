@@ -1,15 +1,8 @@
-use std::fs::File;
+//use std::fs::File;
 use std::io::{self, BufRead};
-use std::path::Path;
+//use std::path::Path;
 
-// https://doc.rust-lang.org/rust-by-example/std_misc/file/read_lines.html
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where
-    P: AsRef<Path>,
-{
-    let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
-}
+use advent_of_code::read_lines;
 
 // parse a vector of bits
 fn parse_zero(i: &str) -> nom::IResult<&str, bool> {
