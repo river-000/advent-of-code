@@ -209,6 +209,9 @@ const NO: usize = 5;
 
 pub fn day() {
     implement_day_twoforone(NO, "", parse, solve_part1_and_part2);
+    //implement_day_twoforone(NO, "evil/5-20000-6400-fixed.in", parse, solve_part1_and_part2);
+    //implement_day_twoforone(NO, "evil/5-50000-10000.in", parse, solve_part1_and_part2);
+    //implement_day_twoforone(NO, "evil/5-50000-10000000.in", parse, solve_part1_and_part2);
 }
 
 #[cfg(test)]

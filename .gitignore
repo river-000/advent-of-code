@@ -19,3 +19,4 @@ Cargo.lock
 *~
 perf.data
 perf.data.old
+data/evil/

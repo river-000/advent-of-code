@@ -3,7 +3,12 @@ use std::io::{self, BufRead};
 use std::path::Path;
 
 pub fn filename(no: usize, example: &str) -> String {
-  format!("data/day{}{}.txt", no, example)
+  if example != "" {
+    format!("data/{}", example)
+  }
+  else {
+    format!("data/day{}{}.txt", no, example)
+  }
 }
 
 pub fn implement_day<T>(no: usize, example: &str, parse: fn(&str) -> Result<T, ()>, part1: fn(&T) -> i64, part2: fn(&T) -> i64) {
