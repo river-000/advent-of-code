@@ -126,14 +126,7 @@ fn solve_part1(lines: &Vec<Line>) -> i64 {
         }
     }
 
-    let mut ctr = 0;
-    for val in map.values() {
-        if *val >= 2 {
-            ctr += 1;
-        }
-    }
-
-    ctr
+    map.values().filter(|&&v| v >= 2).count() as i64
 }
 
 fn solve_part2(lines: &Vec<Line>) -> i64 {
@@ -145,14 +138,7 @@ fn solve_part2(lines: &Vec<Line>) -> i64 {
         }
     }
 
-    let mut ctr = 0;
-    for val in map.values() {
-        if *val >= 2 {
-            ctr += 1;
-        }
-    }
-
-    ctr
+    map.values().filter(|&&v| v >= 2).count() as i64
 }
 
 //
