@@ -55,14 +55,37 @@ struct LineIterator<'a> {
     line: &'a Line,
     first: bool,
     pos: (i64, i64),
+    dx: i64,
+    dy: i64,
 }
 
 impl<'a> LineIterator<'a> {
     fn new(line: &'a Line) -> Self {
+        let mut dx = 0;
+        let mut dy = 0;
+
+        if line.from.0 < line.to.0 {
+            dx = 1;
+        }
+
+        if line.from.1 < line.to.1 {
+            dy = 1;
+        }
+
+        if line.from.0 > line.to.0 {
+            dx = -1;
+        }
+
+        if line.from.1 > line.to.1 {
+            dy = -1;
+        }
+
         LineIterator {
             line: line,
             first: true,
             pos: line.from,
+            dx: dx,
+            dy: dy,
         }
     }
 }
@@ -71,9 +94,6 @@ impl<'a> Iterator for LineIterator<'a> {
     type Item = (i64, i64);
 
     fn next(&mut self) -> Option<Self::Item> {
-        let mut dx = 0;
-        let mut dy = 0;
-
         if self.first {
             self.first = false;
             return Some(self.pos);
@@ -83,23 +103,7 @@ impl<'a> Iterator for LineIterator<'a> {
             return None;
         }
 
-        if self.pos.0 < self.line.to.0 {
-            dx = 1;
-        }
-
-        if self.pos.1 < self.line.to.1 {
-            dy = 1;
-        }
-
-        if self.pos.0 > self.line.to.0 {
-            dx = -1;
-        }
-
-        if self.pos.1 > self.line.to.1 {
-            dy = -1;
-        }
-
-        self.pos = (self.pos.0 + dx, self.pos.1 + dy);
+        self.pos = (self.pos.0 + self.dx, self.pos.1 + self.dy);
         Some(self.pos)
     }
 }
@@ -133,8 +137,10 @@ fn measure_grid(lines: &Vec<Line>) -> (i64, i64) {
 
 fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
     let (cols, rows) = measure_grid(lines);
-    let mut map1 = advent_of_code::zeros((cols * rows) as u32);
-    let mut map2 = advent_of_code::zeros((cols * rows) as u32);
+    //let mut map1 = advent_of_code::zeros((cols * rows) as u32);
+    //let mut map2 = advent_of_code::zeros((cols * rows) as u32);
+    let mut map1 = vec![0u8; (cols * rows) as usize];
+    let mut map2 = vec![0u8; (cols * rows) as usize];
 
     for line in lines {
         for point in LineIterator::new(&line).into_iter() {
