@@ -152,19 +152,30 @@ fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
     let mut map1 = vec![0u8; (cols * rows) as usize];
     let mut map2 = vec![0u8; (cols * rows) as usize];
 
+    let mut ctr1 = 0;
+    let mut ctr2 = 0;
+
     for line in lines {
         for point in LineIterator::new(&line).into_iter() {
             if is_horizontal_or_vertical(&line) {
-                map1[(point.0 + cols * point.1) as usize] += 1
+                map1[(point.0 + cols * point.1) as usize] += 1;
+                if map1[(point.0 + cols * point.1) as usize] == 2 {
+                    ctr1 += 1;
+                }
             }
-            map2[(point.0 + cols * point.1) as usize] += 1
+            map2[(point.0 + cols * point.1) as usize] += 1;
+            if map2[(point.0 + cols * point.1) as usize] == 2 {
+                ctr2 += 1;
+            }
         }
     }
 
-    (
-        map1.iter().filter(|&&v| v >= 2).count() as i64,
-        map2.iter().filter(|&&v| v >= 2).count() as i64,
-    )
+    //(
+    //    map1.iter().filter(|&&v| v >= 2).count() as i64,
+    //    map2.iter().filter(|&&v| v >= 2).count() as i64,
+    //)
+
+    (ctr1, ctr2)
 }
 
 fn solve_part1(lines: &Vec<Line>) -> i64 {
