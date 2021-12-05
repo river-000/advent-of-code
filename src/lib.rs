@@ -14,6 +14,13 @@ pub fn implement_day<T>(no: usize, example: &str, parse: fn(&str) -> Result<T, (
   println!("{} {}", pt1, pt2);
 }
 
+pub fn implement_day_twoforone<T>(no: usize, example: &str, parse: fn(&str) -> Result<T, ()>, solve: fn(&T) -> (i64, i64)) {
+  let name = filename(no, example);
+  let data: T = parse(&name).unwrap();
+  let (pt1, pt2) = solve(&data);
+  println!("{} {}", pt1, pt2);
+}
+
 pub fn implement_test<T>(no: usize, example: &str, parse: fn(&str) -> Result<T, ()>, part: fn(&T) -> i64, expect: i64) {
   let name = filename(no, example);
   let data = parse(&name).unwrap();
@@ -63,4 +70,15 @@ pub fn parse_whitespacesep_numbers(i: &str) -> nom::IResult<&str, Vec<i64>> {
 
 pub fn parse_grid_numbers(i: &str) -> nom::IResult<&str, Vec<Vec<i64>>> {
   nom::multi::separated_list1(nom::character::complete::newline, parse_whitespacesep_numbers)(i)
+}
+
+pub fn zeros(size: u32) -> Vec<i32> {
+  let mut zero_vec: Vec<i32> = Vec::with_capacity(size as usize);
+  /*
+  for i in 0..size {
+      zero_vec.push(0);
+  }
+  */
+  zero_vec.resize(size as usize, 0);
+  return zero_vec;
 }

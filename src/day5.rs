@@ -117,42 +117,56 @@ where
     */
 }
 
-fn solve_part1(lines: &Vec<Line>) -> i64 {
-    let mut map = HashMap::new();
+fn measure_grid(lines: &Vec<Line>) -> (i64, i64) {
+    let mut mx = 0;
+    let mut my = 0;
 
     for line in lines {
-        if is_horizontal_or_vertical(&line) {
-            for point in LineIterator::new(&line).into_iter() {
-                map_increment(&mut map, point);
-            }
-        }
+        mx = std::cmp::max(mx, line.from.0);
+        mx = std::cmp::max(mx, line.to.0);
+        my = std::cmp::max(my, line.from.1);
+        my = std::cmp::max(my, line.to.1);
     }
 
-    map.values().filter(|&&v| v >= 2).count() as i64
+    (mx + 1, my + 1)
 }
 
-fn solve_part2(lines: &Vec<Line>) -> i64 {
-    let mut map = HashMap::new();
+fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
+    let (cols, rows) = measure_grid(lines);
+    let mut map1 = advent_of_code::zeros((cols * rows) as u32);
+    let mut map2 = advent_of_code::zeros((cols * rows) as u32);
 
     for line in lines {
         for point in LineIterator::new(&line).into_iter() {
-            map_increment(&mut map, point);
+            if is_horizontal_or_vertical(&line) {
+                map1[(point.0 + cols * point.1) as usize] += 1
+            }
+            map2[(point.0 + cols * point.1) as usize] += 1
         }
     }
 
-    map.values().filter(|&&v| v >= 2).count() as i64
+    (map1.iter().filter(|&&v| v >= 2).count() as i64, map2.iter().filter(|&&v| v >= 2).count() as i64)
+}
+
+fn solve_part1(lines: &Vec<Line>) -> i64 {
+    solve_part1_and_part2(lines).0
+}
+
+fn solve_part2(lines: &Vec<Line>) -> i64 {
+    solve_part1_and_part2(lines).1
 }
 
 //
 
-use advent_of_code::implement_day;
+//use advent_of_code::implement_day;
+use advent_of_code::implement_day_twoforone;
 #[cfg(test)]
 use advent_of_code::implement_test;
 
 const NO: usize = 5;
 
 pub fn day() {
-    implement_day(NO, "", parse, solve_part1, solve_part2);
+    implement_day_twoforone(NO, "", parse, solve_part1_and_part2);
 }
 
 #[cfg(test)]
