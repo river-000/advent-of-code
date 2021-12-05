@@ -150,7 +150,7 @@ fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
     //let mut map1 = advent_of_code::zeros((cols * rows) as u32);
     //let mut map2 = advent_of_code::zeros((cols * rows) as u32);
     let mut map1 = vec![0u8; (cols * rows) as usize];
-    let mut map2 = vec![0u8; (cols * rows) as usize];
+    //let mut map2 = vec![0u8; (cols * rows) as usize];
 
     let mut ctr1 = 0;
     let mut ctr2 = 0;
@@ -158,15 +158,27 @@ fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
     for line in lines {
         for point in LineIterator::new(&line).into_iter() {
             if is_horizontal_or_vertical(&line) {
-                map1[(point.0 + cols * point.1) as usize] += 1;
-                if map1[(point.0 + cols * point.1) as usize] == 2 {
-                    ctr1 += 1;
+
+                if map1[(point.0 + cols * point.1) as usize] & 0x0F < 0x2 {
+                    map1[(point.0 + cols * point.1) as usize] += 0x01;
+                    if map1[(point.0 + cols * point.1) as usize] & 0x0F == 0x02 {
+                        ctr1 += 1;
+                    }
+                }
+
+            }
+
+            if map1[(point.0 + cols * point.1) as usize] & 0xF0 < 0x20 {
+                map1[(point.0 + cols * point.1) as usize] += 0x10;
+                if map1[(point.0 + cols * point.1) as usize] & 0xF0 == 0x20 {
+                    ctr2 += 1;
                 }
             }
-            map2[(point.0 + cols * point.1) as usize] += 1;
-            if map2[(point.0 + cols * point.1) as usize] == 2 {
-                ctr2 += 1;
-            }
+
+            //map1[(point.0 + cols * point.1) as usize] += 0x10;
+            //if map1[(point.0 + cols * point.1) as usize] == 2 {
+            //    ctr2 += 1;
+            //}
         }
     }
 
