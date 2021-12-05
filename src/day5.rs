@@ -51,16 +51,16 @@ pub fn parse(filename: &str) -> Result<Vec<Line>, ()> {
     Ok(result)
 }
 
-struct LineIterator<'a> {
-    line: &'a Line,
+struct LineIterator {
     first: bool,
     pos: (i64, i64),
+    to: (i64, i64),
     dx: i64,
     dy: i64,
 }
 
-impl<'a> LineIterator<'a> {
-    fn new(line: &'a Line) -> Self {
+impl LineIterator {
+    fn new(line: &Line) -> Self {
         let mut dx = 0;
         let mut dy = 0;
 
@@ -80,17 +80,27 @@ impl<'a> LineIterator<'a> {
             dy = -1;
         }
 
-        LineIterator {
-            line: line,
-            first: true,
-            pos: line.from,
-            dx: dx,
-            dy: dy,
+        if dx < 0 {
+            LineIterator {
+                first: true,
+                pos: line.to,
+                to: line.from,
+                dx: -dx,
+                dy: -dy,
+            }
+        } else {
+            LineIterator {
+                first: true,
+                pos: line.from,
+                to: line.to,
+                dx: dx,
+                dy: dy,
+            }
         }
     }
 }
 
-impl<'a> Iterator for LineIterator<'a> {
+impl Iterator for LineIterator {
     type Item = (i64, i64);
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -99,7 +109,7 @@ impl<'a> Iterator for LineIterator<'a> {
             return Some(self.pos);
         }
 
-        if (self.pos.0 == self.line.to.0) && (self.pos.1 == self.line.to.1) {
+        if (self.pos.0 == self.to.0) && (self.pos.1 == self.to.1) {
             return None;
         }
 
@@ -151,7 +161,10 @@ fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
         }
     }
 
-    (map1.iter().filter(|&&v| v >= 2).count() as i64, map2.iter().filter(|&&v| v >= 2).count() as i64)
+    (
+        map1.iter().filter(|&&v| v >= 2).count() as i64,
+        map2.iter().filter(|&&v| v >= 2).count() as i64,
+    )
 }
 
 fn solve_part1(lines: &Vec<Line>) -> i64 {
