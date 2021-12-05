@@ -1,6 +1,8 @@
-use std::io::{self, BufRead};
-use advent_of_code::read_lines;
 use advent_of_code::parse_number;
+use advent_of_code::read_lines;
+use std::collections::HashMap;
+use std::hash::Hash;
+use std::io::{self, BufRead};
 
 #[derive(Debug)]
 pub struct Line {
@@ -8,12 +10,16 @@ pub struct Line {
     to: (i64, i64),
 }
 
+fn is_horizontal_or_vertical(l: &Line) -> bool {
+    l.from.0 == l.to.0 || l.from.1 == l.to.1
+}
+
 fn parse_point(i: &str) -> nom::IResult<&str, (i64, i64)> {
     let (i, a) = parse_number(i)?;
     let (i, _) = nom::bytes::complete::tag(",")(i)?;
     let (i, b) = parse_number(i)?;
 
-    Ok((i, (a,b)))
+    Ok((i, (a, b)))
 }
 
 // parse a vector of bits
@@ -46,6 +52,109 @@ pub fn parse(filename: &str) -> Result<Vec<Line>, ()> {
     Ok(result)
 }
 
+struct LineIterator<'a> {
+    line: &'a Line,
+    first: bool,
+    pos: (i64, i64),
+}
+
+impl<'a> LineIterator<'a> {
+    fn new(line: &'a Line) -> Self {
+        LineIterator {
+            line: line,
+            first: true,
+            pos: line.from,
+        }
+    }
+}
+
+impl<'a> Iterator for LineIterator<'a> {
+    type Item = (i64, i64);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut dx = 0;
+        let mut dy = 0;
+
+        if self.first {
+            self.first = false;
+            return Some(self.pos);
+        }
+
+        if (self.pos.0 == self.line.to.0) && (self.pos.1 == self.line.to.1) {
+            return None;
+        }
+
+        if self.pos.0 < self.line.to.0 {
+            dx = 1;
+        }
+
+        if self.pos.1 < self.line.to.1 {
+            dy = 1;
+        }
+
+        if self.pos.0 > self.line.to.0 {
+            dx = -1;
+        }
+
+        if self.pos.1 > self.line.to.1 {
+            dy = -1;
+        }
+
+        self.pos = (self.pos.0 + dx, self.pos.1 + dy);
+        Some(self.pos)
+    }
+}
+
+fn map_increment<K>(m: &mut HashMap<K, i64>, k: K) -> ()
+where
+    K: Hash + Eq,
+{
+    match m.get(&k) {
+        None => m.insert(k, 1),
+        Some(x) => m.insert(k, x + 1),
+    };
+}
+
+fn solve_part1(lines: &Vec<Line>) -> i64 {
+    let mut map = HashMap::new();
+
+    for line in lines {
+        if is_horizontal_or_vertical(&line) {
+            for point in LineIterator::new(&line).into_iter() {
+                map_increment(&mut map, point);
+            }
+        }
+    }
+
+    let mut ctr = 0;
+    for val in map.values() {
+        if *val >= 2 {
+            ctr += 1;
+        }
+    }
+
+    ctr
+}
+
+fn solve_part2(lines: &Vec<Line>) -> i64 {
+    let mut map = HashMap::new();
+
+    for line in lines {
+        for point in LineIterator::new(&line).into_iter() {
+            map_increment(&mut map, point);
+        }
+    }
+
+    let mut ctr = 0;
+    for val in map.values() {
+        if *val >= 2 {
+            ctr += 1;
+        }
+    }
+
+    ctr
+}
+
 //
 
 use advent_of_code::implement_day;
@@ -55,25 +164,20 @@ use advent_of_code::implement_test;
 const NO: usize = 5;
 
 pub fn day() {
-    let name = advent_of_code::filename(NO, ".example");
-    let data = parse(&name).unwrap();
-    println!("{:?}", data)
-    //implement_day(NO, "", parse, part1_solve, part2_solve);
+    implement_day(NO, "", parse, solve_part1, solve_part2);
 }
 
-/*
 #[cfg(test)]
 mod tests {
-    use crate::day3::*;
+    use crate::day5::*;
 
     #[test]
     pub fn part1() {
-        implement_test(NO, "", parse, part1_solve, 3374136);
+        implement_test(NO, "", parse, solve_part1, 4421);
     }
 
     #[test]
     pub fn part2() {
-        implement_test(NO, "", parse, part2_solve, 4432698);
+        implement_test(NO, "", parse, solve_part2, 18674);
     }
 }
-*/
