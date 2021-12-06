@@ -2,15 +2,92 @@ use advent_of_code::parse_number;
 use advent_of_code::read_lines;
 use std::collections::HashMap;
 use std::hash::Hash;
+use std::collections::hash_set::HashSet;
+use itertools::Itertools;
+use std::cmp::Ordering;
+
+#[derive(PartialEq)]
+#[derive(Debug)]
+enum LineType {
+    Horizontal,
+    Vertical,
+    DiagonalDR,
+    DiagonalDL,
+}
 
 #[derive(Debug)]
 pub struct Line {
     from: (i64, i64),
     to: (i64, i64),
+    typ: LineType,
+}
+
+impl Line {
+    fn new(from: (i64, i64), to: (i64, i64)) -> Line {
+        match (from.0.cmp(&to.0), from.1.cmp(&to.1)) {
+            (Ordering::Less, Ordering::Less) =>
+            Line{
+                from: from,
+                to: to,
+                typ: LineType::DiagonalDR
+            },
+            (Ordering::Equal, Ordering::Less) =>
+            Line{
+                from: from,
+                to: to,
+                typ: LineType::Vertical
+            },
+            (Ordering::Greater, Ordering::Less) =>
+            Line{
+                from: from,
+                to: to,
+                typ: LineType::DiagonalDL
+            },
+
+            (Ordering::Less, Ordering::Equal) =>
+            Line{
+                from: from,
+                to: to,
+                typ: LineType::Horizontal
+            },
+            (Ordering::Equal, Ordering::Equal) =>
+            Line{
+                from: from,
+                to: to,
+                typ: LineType::Horizontal
+            },
+            (Ordering::Greater, Ordering::Equal) =>
+            Line{
+                from: to,
+                to: from,
+                typ: LineType::Horizontal
+            },
+
+            (Ordering::Less, Ordering::Greater) =>
+            Line{
+                from: to,
+                to: from,
+                typ: LineType::DiagonalDL
+            },
+            (Ordering::Equal, Ordering::Greater) =>
+            Line{
+                from: to,
+                to: from,
+                typ: LineType::Vertical
+            },
+            (Ordering::Greater, Ordering::Greater) =>
+            Line{
+                from: to,
+                to: from,
+                typ: LineType::DiagonalDR
+            },
+        }
+    }
 }
 
 fn is_horizontal_or_vertical(l: &Line) -> bool {
-    l.from.0 == l.to.0 || l.from.1 == l.to.1
+    l.typ == LineType::Horizontal ||
+    l.typ == LineType::Vertical
 }
 
 fn parse_point(i: &str) -> nom::IResult<&str, (i64, i64)> {
@@ -29,7 +106,7 @@ fn parse_line(i: &str) -> nom::IResult<&str, Line> {
     let (i, _) = nom::character::complete::space1(i)?;
     let (i, b) = parse_point(i)?;
 
-    Ok((i, Line { from: a, to: b }))
+    Ok((i, Line::new(a,b)))
 }
 
 pub fn parse(filename: &str) -> Result<Vec<Line>, ()> {
@@ -51,143 +128,168 @@ pub fn parse(filename: &str) -> Result<Vec<Line>, ()> {
     Ok(result)
 }
 
-struct LineIterator {
-    first: bool,
-    pos: (i64, i64),
-    to: (i64, i64),
-    dx: i64,
-    dy: i64,
+fn intersect_lines(intpoints: &mut HashSet<(i64,i64)>, a: &Line, b: &Line) {
+    intersect_lines_helper(intpoints, a, b, false);
 }
 
-impl LineIterator {
-    fn new(line: &Line) -> Self {
-        let mut dx = 0;
-        let mut dy = 0;
+fn mirror_if(mirror: bool, a: (i64, i64)) -> (i64, i64) {
+    if mirror {
+        (a.1, a.0)
+    }
+    else {
+        a
+    }
+}
 
-        if line.from.0 < line.to.0 {
-            dx = 1;
-        }
+fn mirror_line(a: Line) -> Line {
+    Line::new(mirror_if(true, a.from), mirror_if(true, a.to))
+}
 
-        if line.from.1 < line.to.1 {
-            dy = 1;
-        }
+fn intersect_lines_helper(intpoints: &mut HashSet<(i64,i64)>, a: &Line, b: &Line, mirror: bool) {
+    //    intpoints.insert(a.from);
+    match (&a.typ, &b.typ) {
+        (LineType::Horizontal, LineType::Horizontal) => {
+            // aaaaaaaaaaaaa
+            //    bbbbbbbbbbbbbbb
+            //    L        R
+            //
+            // aaaaaaaaaaaaa
+            //      bbbb
+            //      L  R
+            //
+            //       aaaaaaaa
+            //   bbbbbbb
+            //       L R
+            //
+            // aaaaa
+            //       bbbbbb
+            //     R L
 
-        if line.from.0 > line.to.0 {
-            dx = -1;
-        }
+            let l = std::cmp::max(a.from.0, b.from.0);
+            let r = std::cmp::max(a.to.0, b.to.0);
 
-        if line.from.1 > line.to.1 {
-            dy = -1;
-        }
-
-        if dx < 0 {
-            LineIterator {
-                first: true,
-                pos: line.to,
-                to: line.from,
-                dx: -dx,
-                dy: -dy,
+            for xc in (l..r+1) {
+                intpoints.insert(mirror_if(mirror, (xc, a.from.1)));
             }
-        } else {
-            LineIterator {
-                first: true,
-                pos: line.from,
-                to: line.to,
-                dx: dx,
-                dy: dy,
+        },
+        (LineType::Horizontal, LineType::Vertical) => {
+            //      b
+            //      b
+            // aaaaaxaaaaa
+            //      b
+            //      b
+            //      b
+
+            if a.from.0 <= b.from.0 && b.from.0 <= a.to.0 {
+                if b.from.1 <= a.from.1 && a.from.1 <= a.to.1 {
+                    intpoints.insert(mirror_if(mirror, (b.from.0, a.from.1)));
+                }
             }
-        }
+        },
+        (LineType::Horizontal, LineType::DiagonalDR) => {
+            //      b
+            //       b
+            // aaaaaaaxaaa
+            //        ^b
+            //        | b
+            //       xc  b  = b.from.0 + 2
+            //                  2 = a.from.1 - b.from.1
+
+            let xc = b.from.0 + a.from.1 - b.from.1;
+
+            if a.from.0 <= xc && xc <= a.to.0 {
+                if b.from.1 <= a.from.1 && a.from.1 <= a.to.1 {
+                    intpoints.insert(mirror_if(mirror, (b.from.0, a.from.1)));
+                }
+            }
+        },
+        (LineType::Horizontal, LineType::DiagonalDL) => {
+            //      b
+            //     b
+            // aaaxaaaaaaa
+            //   b
+
+            let xc = b.from.0 - (a.from.1 - b.from.1);
+
+            if a.from.0 <= xc && xc <= a.to.0 {
+                if b.from.1 <= a.from.1 && a.from.1 <= a.to.1 {
+                    intpoints.insert(mirror_if(mirror, (b.from.0, a.from.1)));
+                }
+            }
+        },
+
+        (LineType::Vertical, LineType::Horizontal) => {
+            intersect_lines(intpoints, b, a)
+        },
+        (LineType::Vertical, LineType::Vertical) => {
+            // similar to hori hori
+
+            let l = std::cmp::max(a.from.1, b.from.1);
+            let r = std::cmp::max(a.to.1, b.to.1);
+
+            for yc in (l..r+1) {
+                intpoints.insert((a.from.0, yc));
+            }
+        },
+        (LineType::Vertical, LineType::DiagonalDR) => {
+            if mirror { panic!("mirrored twice!"); }
+            intersect_lines_helper(intpoints, mirror_line(a), mirror_line(b), true);
+        },
+        (LineType::Vertical, LineType::DiagonalDL) => {
+            if mirror { panic!("mirrored twice!"); }
+            intersect_lines_helper(intpoints, mirror_line(a), mirror_line(b), true);
+        },
+
+        (LineType::DiagonalDR, LineType::Horizontal) => {
+            intersect_lines(intpoints, b, a)
+        },
+        (LineType::DiagonalDR, LineType::Vertical) => {
+            intersect_lines(intpoints, b, a)
+        },
+        (LineType::DiagonalDR, LineType::DiagonalDR) => {
+            
+        },
+        (LineType::DiagonalDR, LineType::DiagonalDL) => {
+            // case 1
+            // a   b
+            //  a b
+            //   x
+            //  b a
+            //     a
+            //
+            // case 2
+            // a  b
+            //  ab
+            //  ba
+            // b  a
+            //     a
+
+            
+        },
+
+        (LineType::DiagonalDL, LineType::Horizontal) => {
+            intersect_lines(intpoints, b, a)
+        },
+        (LineType::DiagonalDL, LineType::Vertical) => {
+            intersect_lines(intpoints, b, a)
+        },
+        (LineType::DiagonalDL, LineType::DiagonalDR) => {
+            intersect_lines(intpoints, b, a)
+        },
+        (LineType::DiagonalDL, LineType::DiagonalDL) => {
+            
+        },
     }
-}
-
-impl Iterator for LineIterator {
-    type Item = (i64, i64);
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.first {
-            self.first = false;
-            return Some(self.pos);
-        }
-
-        if (self.pos.0 == self.to.0) && (self.pos.1 == self.to.1) {
-            return None;
-        }
-
-        self.pos = (self.pos.0 + self.dx, self.pos.1 + self.dy);
-        Some(self.pos)
-    }
-}
-
-fn map_increment<K>(m: &mut HashMap<K, i64>, k: K) -> ()
-where
-    K: Hash + Eq,
-{
-    *m.entry(k).or_default() += 1
-    /*
-    match m.get(&k) {
-        None => m.insert(k, 1),
-        Some(x) => m.insert(k, x + 1),
-    };
-    */
-}
-
-fn measure_grid(lines: &Vec<Line>) -> (i64, i64) {
-    let mut mx = 0;
-    let mut my = 0;
-
-    for line in lines {
-        mx = std::cmp::max(mx, line.from.0);
-        mx = std::cmp::max(mx, line.to.0);
-        my = std::cmp::max(my, line.from.1);
-        my = std::cmp::max(my, line.to.1);
-    }
-
-    (mx + 1, my + 1)
 }
 
 fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
-    let (cols, rows) = measure_grid(lines);
-    //let mut map1 = advent_of_code::zeros((cols * rows) as u32);
-    //let mut map2 = advent_of_code::zeros((cols * rows) as u32);
-    let mut map1 = vec![0u8; (cols * rows) as usize];
-    //let mut map2 = vec![0u8; (cols * rows) as usize];
+    let mut intpoints: HashSet<(i64,i64)> = HashSet::new();
 
-    let mut ctr1 = 0;
-    let mut ctr2 = 0;
-
-    for line in lines {
-        for point in LineIterator::new(&line).into_iter() {
-            if is_horizontal_or_vertical(&line) {
-
-                if map1[(point.0 + cols * point.1) as usize] & 0x0F < 0x2 {
-                    map1[(point.0 + cols * point.1) as usize] += 0x01;
-                    if map1[(point.0 + cols * point.1) as usize] & 0x0F == 0x02 {
-                        ctr1 += 1;
-                    }
-                }
-
-            }
-
-            if map1[(point.0 + cols * point.1) as usize] & 0xF0 < 0x20 {
-                map1[(point.0 + cols * point.1) as usize] += 0x10;
-                if map1[(point.0 + cols * point.1) as usize] & 0xF0 == 0x20 {
-                    ctr2 += 1;
-                }
-            }
-
-            //map1[(point.0 + cols * point.1) as usize] += 0x10;
-            //if map1[(point.0 + cols * point.1) as usize] == 2 {
-            //    ctr2 += 1;
-            //}
-        }
+    for (a, b) in lines.into_iter().tuple_combinations() {
+        intersect_lines(&mut intpoints, a, b);
     }
 
-    //(
-    //    map1.iter().filter(|&&v| v >= 2).count() as i64,
-    //    map2.iter().filter(|&&v| v >= 2).count() as i64,
-    //)
-
-    (ctr1, ctr2)
+    (0, intpoints.len() as i64)
 }
 
 fn solve_part1(lines: &Vec<Line>) -> i64 {
@@ -209,6 +311,7 @@ const NO: usize = 5;
 
 pub fn day() {
     implement_day_twoforone(NO, "", parse, solve_part1_and_part2);
+    //implement_day_twoforone(NO, "evil/5-50000-10000000.in", parse, solve_part1_and_part2);
     //implement_day_twoforone(NO, "evil/5-20000-6400-fixed.in", parse, solve_part1_and_part2);
     //implement_day_twoforone(NO, "evil/5-50000-10000.in", parse, solve_part1_and_part2);
     //implement_day_twoforone(NO, "evil/5-50000-10000000.in", parse, solve_part1_and_part2);
