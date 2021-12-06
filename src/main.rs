@@ -7,7 +7,8 @@ mod day6;
 
 use std::time::SystemTime;
 
-fn time_it(f: fn() -> ()) {
+fn time_it(n: usize, f: fn() -> ()) {
+    println!("day {}", n);
     let start = SystemTime::now();
     f();
     let stop = SystemTime::now();
@@ -17,10 +18,10 @@ fn time_it(f: fn() -> ()) {
 }
 
 fn main() {
-    time_it(day1::day);
-    time_it(day2::day);
-    time_it(day3::day);
-    time_it(day4::day);
-    time_it(day5::day);
-    time_it(day6::day);
+    time_it(1,day1::day);
+    time_it(2,day2::day);
+    time_it(3,day3::day);
+    time_it(4,day4::day);
+    time_it(5,day5::day);
+    time_it(6,day6::day);
 }
