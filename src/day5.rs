@@ -187,7 +187,7 @@ fn intersect_lines_helper(intpoints: &mut HashSet<(i64, i64)>, a: &Line, b: &Lin
             //      b
 
             if a.from.0 <= b.from.0 && b.from.0 <= a.to.0 {
-                if b.from.1 <= a.from.1 && a.from.1 <= a.to.1 {
+                if b.from.1 <= a.from.1 && a.from.1 <= b.to.1 {
                     intpoints.insert(mirror_if(mirror, (b.from.0, a.from.1)));
                 }
             }
@@ -344,8 +344,11 @@ fn intersect_lines_helper(intpoints: &mut HashSet<(i64, i64)>, a: &Line, b: &Lin
                 let ly = std::cmp::max(a.from.1, b.from.1);
                 let ry = std::cmp::min(a.to.1, b.to.1);
 
+                let lx = std::cmp::min(a.from.0, b.from.0);
+                let rx = std::cmp::max(a.to.0, b.to.0);
+
                 for xc in (ly - ly..ry - ly + 1) {
-                    intpoints.insert(mirror_if(mirror, (lx - xc, ry + xc)));
+                    intpoints.insert(mirror_if(mirror, (lx - xc, ly + xc)));
                 }
             }
         }
@@ -357,8 +360,15 @@ fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
 
     for (a, b) in lines.into_iter().tuple_combinations() {
         intersect_lines(&mut intpoints, a, b);
-    }
 
+        /*
+        if intpoints.get(&(2,4)).is_some() {
+            println!("DEBUG INFO: {:?} {:?}", a, b)
+        }
+        */
+    }
+/*
+    
     let mut grid: Vec<Vec<bool>> = vec![vec![false; 9]; 9];
     let mut my_intpoints: HashSet<(i64, i64)> = HashSet::new();
 
@@ -373,7 +383,9 @@ fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
     //let (a, b) = (Line::new((0, 0), (0, 8)), Line::new((0, 3), (0, 5)));
     //let (a, b) = (Line::new((0, 0), (8, 8)), Line::new((5, 3), (3, 5)));
     //let (a, b) = (Line::new((0, 0), (8, 8)), Line::new((5+1, 3), (3+1, 5)));
-    let (a, b) = (Line::new((0, 8), (8, 0)), Line::new((7, 1), (6, 2)));
+    //let (a, b) = (Line::new((0, 8), (8, 0)), Line::new((7, 1), (6, 2)));
+    //let (a, b) = (Line::new((0, 8), (5, 8)), Line::new((0, 8), (2, 8)));
+    let (a, b) = (Line::new((2, 1), (2, 2)), Line::new((1, 4), (3, 4)));
 
     intersect_lines(&mut my_intpoints, &a, &b);
 
@@ -406,6 +418,19 @@ fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
         }
         println!("");
     }
+    
+
+    for j in 0..10 {
+        for i in 0..10 {
+            if intpoints.get(&(i, j)).is_some() {
+                print!("x");
+            } else {
+                print!(".");
+            }
+        }
+        println!("");
+    }
+    */
 
     (0, intpoints.len() as i64)
 }
@@ -428,7 +453,8 @@ use advent_of_code::implement_test;
 const NO: usize = 5;
 
 pub fn day() {
-    implement_day_twoforone(NO, "day5.example.txt", parse, solve_part1_and_part2);
+    //implement_day_twoforone(NO, "day5.example.txt", parse, solve_part1_and_part2);
+    implement_day_twoforone(NO, "", parse, solve_part1_and_part2);
     //implement_day_twoforone(NO, "evil/5-50000-10000000.in", parse, solve_part1_and_part2);
     //implement_day_twoforone(NO, "evil/5-20000-6400-fixed.in", parse, solve_part1_and_part2);
     //implement_day_twoforone(NO, "evil/5-50000-10000.in", parse, solve_part1_and_part2);
@@ -448,19 +474,45 @@ mod tests {
     pub fn part2() {
         implement_test(NO, "", parse, solve_part2, 18674);
     }
-} /*
-    0123456789
+}
 
-    1.1....11.
-    .111...2..
-    ..2.1.111.
-    ...1.2.2..
-    .112313211
-    ...1.2....
-    ..1...1...
-    .1.....1..
-    1.......1.
-    222111....
+/*
+0123456789
+
+1.1....11.
+.111...2..
+..2.1.111.
+...1.2.2..
+.112313211
+...1.2....
+..1...1...
+.1.....1..
+1.......1.
+222111....
+
+
+..........
+.......2..
+..2.......
+.....2.2..
+...23.32..
+.....2....
+..........
+..........
+..........
+222.......
+
+..........
+.......x..
+..x.......
+.....x.x..
+..xxx.xx..
+.....x....
+..........
+..........
+..........
+xxx.......
+
 
   ....x....x
   .........x
