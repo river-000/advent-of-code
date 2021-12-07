@@ -204,7 +204,7 @@ fn intersect_lines_helper(intpoints: &mut HashSet<(i64, i64)>, a: &Line, b: &Lin
             let xc = b.from.0 + a.from.1 - b.from.1;
 
             if a.from.0 <= xc && xc <= a.to.0 {
-                if b.from.1 <= a.from.1 && a.from.1 <= a.to.1 {
+                if b.from.1 <= a.from.1 && a.from.1 <= b.to.1 {
                     intpoints.insert(mirror_if(mirror, (xc, a.from.1)));
                 }
             }
@@ -218,7 +218,7 @@ fn intersect_lines_helper(intpoints: &mut HashSet<(i64, i64)>, a: &Line, b: &Lin
             let xc = b.from.0 - (a.from.1 - b.from.1);
 
             if a.from.0 <= xc && xc <= a.to.0 {
-                if b.from.1 <= a.from.1 && a.from.1 <= a.to.1 {
+                if b.from.1 <= a.from.1 && a.from.1 <= b.to.1 {
                     intpoints.insert(mirror_if(mirror, (xc, a.from.1)));
                 }
             }
@@ -314,15 +314,18 @@ fn intersect_lines_helper(intpoints: &mut HashSet<(i64, i64)>, a: &Line, b: &Lin
             // by-ay = t-u
             //
             // bx-ax + by-ay = 2t
-            // bx-ay - (by-ay) = 2u
+            // bx-ax - (by-ay) = 2u
             //
             // need to check t >= 0 and <= length of line a
+            //
+            // need to also check we are on line b
 
             let twot = b.from.0 - a.from.0 + b.from.1 - a.from.1;
             if twot % 2 == 0 {
                 let t = twot / 2;
+                let u = (b.from.0 - a.from.0 - (b.from.1 - a.from.1)) / 2;
 
-                if t >= 0 && t <= (a.to.0 - a.from.0) {
+                if t >= 0 && t <= (a.to.0 - a.from.0) && u >= 0 && u <= (b.to.1 - b.from.1) {
                     let x = a.from.0 + t;
                     let y = a.from.1 + t;
                     intpoints.insert(mirror_if(mirror, (x, y)));
@@ -355,11 +358,141 @@ fn intersect_lines_helper(intpoints: &mut HashSet<(i64, i64)>, a: &Line, b: &Lin
     }
 }
 
+struct LineIterator {
+    first: bool,
+    pos: (i64, i64),
+    to: (i64, i64),
+    dx: i64,
+    dy: i64,
+}
+
+impl LineIterator {
+    fn new(line: &Line) -> Self {
+        let mut dx = 0;
+        let mut dy = 0;
+
+        if line.from.0 < line.to.0 {
+            dx = 1;
+        }
+
+        if line.from.1 < line.to.1 {
+            dy = 1;
+        }
+
+        if line.from.0 > line.to.0 {
+            dx = -1;
+        }
+
+        if line.from.1 > line.to.1 {
+            dy = -1;
+        }
+
+        if dx < 0 {
+            LineIterator {
+                first: true,
+                pos: line.to,
+                to: line.from,
+                dx: -dx,
+                dy: -dy,
+            }
+        } else {
+            LineIterator {
+                first: true,
+                pos: line.from,
+                to: line.to,
+                dx: dx,
+                dy: dy,
+            }
+        }
+    }
+}
+
+impl Iterator for LineIterator {
+    type Item = (i64, i64);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.first {
+            self.first = false;
+            return Some(self.pos);
+        }
+
+        if (self.pos.0 == self.to.0) && (self.pos.1 == self.to.1) {
+            return None;
+        }
+
+        self.pos = (self.pos.0 + self.dx, self.pos.1 + self.dy);
+        Some(self.pos)
+    }
+}
+
+fn map_increment<K>(m: &mut HashMap<K, i64>, k: K) -> ()
+where
+    K: Hash + Eq,
+{
+    *m.entry(k).or_default() += 1
+    /*
+    match m.get(&k) {
+        None => m.insert(k, 1),
+        Some(x) => m.insert(k, x + 1),
+    };
+    */
+}
+
+fn measure_grid(lines: &Vec<Line>) -> (i64, i64) {
+    let mut mx = 0;
+    let mut my = 0;
+
+    for line in lines {
+        mx = std::cmp::max(mx, line.from.0);
+        mx = std::cmp::max(mx, line.to.0);
+        my = std::cmp::max(my, line.from.1);
+        my = std::cmp::max(my, line.to.1);
+    }
+
+    (mx + 1, my + 1)
+}
+
 fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
+    ///////////////
+
+    let (cols, rows) = measure_grid(lines);
+    //let mut map1 = advent_of_code::zeros((cols * rows) as u32);
+    //let mut map2 = advent_of_code::zeros((cols * rows) as u32);
+    let mut map1 = vec![0u8; (cols * rows) as usize];
+    //let mut map2 = vec![0u8; (cols * rows) as usize];
+
+    let mut ctr2 = 0;
+
+    for line in lines {
+        for point in LineIterator::new(&line).into_iter() {
+            if map1[(point.0 + cols * point.1) as usize] < 2 {
+                map1[(point.0 + cols * point.1) as usize] += 1;
+                if map1[(point.0 + cols * point.1) as usize] == 2 {
+                    ctr2 += 1;
+                }
+            }
+
+            //map1[(point.0 + cols * point.1) as usize] += 0x10;
+            //if map1[(point.0 + cols * point.1) as usize] == 2 {
+            //    ctr2 += 1;
+            //}
+        }
+    }
+
+    ////////////////////
+
     let mut intpoints: HashSet<(i64, i64)> = HashSet::new();
 
     for (a, b) in lines.into_iter().tuple_combinations() {
         intersect_lines(&mut intpoints, a, b);
+
+        /*
+        for (x,y) in &intpoints {
+            if map1[(x + cols * y) as usize] < 2 {
+                println!("DEBUG INFO: {:?} {:?}", a, b);
+            }
+        }
+        */
 
         /*
         if intpoints.get(&(2,4)).is_some() {
@@ -367,8 +500,9 @@ fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
         }
         */
     }
-/*
-    
+
+
+    /*
     let mut grid: Vec<Vec<bool>> = vec![vec![false; 9]; 9];
     let mut my_intpoints: HashSet<(i64, i64)> = HashSet::new();
 
@@ -385,9 +519,21 @@ fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
     //let (a, b) = (Line::new((0, 0), (8, 8)), Line::new((5+1, 3), (3+1, 5)));
     //let (a, b) = (Line::new((0, 8), (8, 0)), Line::new((7, 1), (6, 2)));
     //let (a, b) = (Line::new((0, 8), (5, 8)), Line::new((0, 8), (2, 8)));
-    let (a, b) = (Line::new((2, 1), (2, 2)), Line::new((1, 4), (3, 4)));
+    //let (a, b) = (Line::new((2, 1), (2, 2)), Line::new((1, 4), (3, 4)));
+    //let (a, b) = (Line::new((517, 570), (645, 570)), Line::new((36, 12), (255, 231)));
+    let (a, b) = (
+        Line::new((98, 67), (945, 914)),
+        Line::new((812, 515), (787, 540)),
+    );
+
+    //DEBUG INFO: Line { from: (517, 570), to: (645, 570), typ: Horizontal } Line { from: (36, 12), to: (255, 231), typ: DiagonalDR }
+    // has this phantom point of intersection {(594, 570)}
+
+    //DEBUG INFO: Line { from: (98, 67), to: (945, 914), typ: DiagonalDR } Line { from: (812, 515), to: (787, 540), typ: DiagonalDL }
+    // phantom {(679, 648)}
 
     intersect_lines(&mut my_intpoints, &a, &b);
+    println!("{:?}", my_intpoints);
 
     {
         let (dx, dy) = line_dx_dy(&a.typ);
@@ -418,7 +564,6 @@ fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
         }
         println!("");
     }
-    
 
     for j in 0..10 {
         for i in 0..10 {
