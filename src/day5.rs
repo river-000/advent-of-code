@@ -453,6 +453,7 @@ fn measure_grid(lines: &Vec<Line>) -> (i64, i64) {
 }
 
 fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
+    /*
     ///////////////
 
     let (cols, rows) = measure_grid(lines);
@@ -480,7 +481,8 @@ fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
     }
 
     ////////////////////
-
+    */
+    
     let mut intpoints: HashSet<(i64, i64)> = HashSet::new();
 
     for (a, b) in lines.into_iter().tuple_combinations() {
@@ -599,10 +601,11 @@ const NO: usize = 5;
 
 pub fn day() {
     //implement_day_twoforone(NO, "day5.example.txt", parse, solve_part1_and_part2);
-    implement_day_twoforone(NO, "", parse, solve_part1_and_part2);
-    //implement_day_twoforone(NO, "evil/5-50000-10000000.in", parse, solve_part1_and_part2);
+    //implement_day_twoforone(NO, "", parse, solve_part1_and_part2);
     //implement_day_twoforone(NO, "evil/5-20000-6400-fixed.in", parse, solve_part1_and_part2);
-    //implement_day_twoforone(NO, "evil/5-50000-10000.in", parse, solve_part1_and_part2);
+    // 9039258 39.038920493s
+    implement_day_twoforone(NO, "evil/5-50000-10000.in", parse, solve_part1_and_part2);
+    // 221.960249029s
     //implement_day_twoforone(NO, "evil/5-50000-10000000.in", parse, solve_part1_and_part2);
 }
 
