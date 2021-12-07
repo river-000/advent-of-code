@@ -75,6 +75,19 @@ impl Line {
     }
 }
 
+fn line_dx_dy(l: &LineType) -> (i64, i64) {
+    match l {
+        LineType::Horizontal => (1, 0),
+        LineType::Vertical => (0, 1),
+        LineType::DiagonalDR => (1, 1),
+        LineType::DiagonalDL => (-1, 1),
+    }
+}
+
+fn line_len(l: &Line) -> i64 {
+    std::cmp::max(l.to.1 - l.from.1, l.to.0 - l.from.0)
+}
+
 fn is_horizontal_or_vertical(l: &Line) -> bool {
     l.typ == LineType::Horizontal || l.typ == LineType::Vertical
 }
@@ -152,9 +165,14 @@ fn intersect_lines_helper(intpoints: &mut HashSet<(i64, i64)>, a: &Line, b: &Lin
             // aaaaa
             //       bbbbbb
             //     R L
+            // ensure y is aligned
+
+            if a.from.1 != b.from.1 {
+                return;
+            }
 
             let l = std::cmp::max(a.from.0, b.from.0);
-            let r = std::cmp::max(a.to.0, b.to.0);
+            let r = std::cmp::min(a.to.0, b.to.0);
 
             for xc in (l..r + 1) {
                 intpoints.insert(mirror_if(mirror, (xc, a.from.1)));
@@ -187,7 +205,7 @@ fn intersect_lines_helper(intpoints: &mut HashSet<(i64, i64)>, a: &Line, b: &Lin
 
             if a.from.0 <= xc && xc <= a.to.0 {
                 if b.from.1 <= a.from.1 && a.from.1 <= a.to.1 {
-                    intpoints.insert(mirror_if(mirror, (b.from.0, a.from.1)));
+                    intpoints.insert(mirror_if(mirror, (xc, a.from.1)));
                 }
             }
         }
@@ -201,7 +219,7 @@ fn intersect_lines_helper(intpoints: &mut HashSet<(i64, i64)>, a: &Line, b: &Lin
 
             if a.from.0 <= xc && xc <= a.to.0 {
                 if b.from.1 <= a.from.1 && a.from.1 <= a.to.1 {
-                    intpoints.insert(mirror_if(mirror, (b.from.0, a.from.1)));
+                    intpoints.insert(mirror_if(mirror, (xc, a.from.1)));
                 }
             }
         }
@@ -210,8 +228,12 @@ fn intersect_lines_helper(intpoints: &mut HashSet<(i64, i64)>, a: &Line, b: &Lin
         (LineType::Vertical, LineType::Vertical) => {
             // similar to hori hori
 
+            if a.from.0 != b.from.0 {
+                return;
+            }
+
             let l = std::cmp::max(a.from.1, b.from.1);
-            let r = std::cmp::max(a.to.1, b.to.1);
+            let r = std::cmp::min(a.to.1, b.to.1);
 
             for yc in (l..r + 1) {
                 intpoints.insert((a.from.0, yc));
@@ -246,10 +268,10 @@ fn intersect_lines_helper(intpoints: &mut HashSet<(i64, i64)>, a: &Line, b: &Lin
                 // same line, situation is very similar to hori hori
 
                 let lx = std::cmp::max(a.from.0, b.from.0);
-                let rx = std::cmp::max(a.to.0, b.to.0);
+                let rx = std::cmp::min(a.to.0, b.to.0);
 
                 let ly = std::cmp::max(a.from.1, b.from.1);
-                let ry = std::cmp::max(a.to.1, b.to.1);
+                let ry = std::cmp::min(a.to.1, b.to.1);
 
                 for xc in (lx - lx..rx - lx + 1) {
                     intpoints.insert(mirror_if(mirror, (lx + xc, ly + xc)));
@@ -318,17 +340,12 @@ fn intersect_lines_helper(intpoints: &mut HashSet<(i64, i64)>, a: &Line, b: &Lin
             //  b
             // a
 
-            if a.from.1 - b.from.1 == a.from.0 - b.from.0 {
-                // same line, situation is very similar to hori hori
-
-                let lx = std::cmp::min(a.from.0, b.from.0);
-                let rx = std::cmp::min(a.to.0, b.to.0);
-
+            if a.from.1 - b.from.1 == -(a.from.0 - b.from.0) {
                 let ly = std::cmp::max(a.from.1, b.from.1);
-                let ry = std::cmp::max(a.to.1, b.to.1);
+                let ry = std::cmp::min(a.to.1, b.to.1);
 
                 for xc in (ly - ly..ry - ly + 1) {
-                    intpoints.insert(mirror_if(mirror, (lx - xc, ly + xc)));
+                    intpoints.insert(mirror_if(mirror, (lx - xc, ry + xc)));
                 }
             }
         }
@@ -342,15 +359,49 @@ fn solve_part1_and_part2(lines: &Vec<Line>) -> (i64, i64) {
         intersect_lines(&mut intpoints, a, b);
     }
 
-    println!("{:?}", intpoints);
+    let mut grid: Vec<Vec<bool>> = vec![vec![false; 9]; 9];
+    let mut my_intpoints: HashSet<(i64, i64)> = HashSet::new();
 
-    for i in 0..=9 {
-        for j in 0..=9 {
-            if intpoints.get(&(i,j)).is_some() {
+    //let (a, b) = (Line::new((0, 0), (8, 0)), Line::new((3, 1), (5, 1)));
+    //let (a, b) = (Line::new((0, 0), (8, 0)), Line::new((3, 0), (5, 0)));
+    //let (a, b) = (Line::new((4, 0), (4, 8)), Line::new((4, 3), (4, 5)));
+    //let (a, b) = (Line::new((1, 5), (6, 5)), Line::new((4, 2), (4, 7)));
+    //let (a, b) = (Line::new((1, 1), (8, 8)), Line::new((3, 3), (6, 6)));
+    //let (a, b) = (Line::new((1, 1), (8, 8)), Line::new((4, 3), (7, 6)));
+    //let (a, b) = (Line::new((1, 5), (8, 5)), Line::new((1, 1), (8, 8)));
+    //let (a, b) = (Line::new((1, 5), (8, 5)), Line::new((8, 1), (1, 8)));
+    //let (a, b) = (Line::new((0, 0), (0, 8)), Line::new((0, 3), (0, 5)));
+    //let (a, b) = (Line::new((0, 0), (8, 8)), Line::new((5, 3), (3, 5)));
+    //let (a, b) = (Line::new((0, 0), (8, 8)), Line::new((5+1, 3), (3+1, 5)));
+    let (a, b) = (Line::new((0, 8), (8, 0)), Line::new((7, 1), (6, 2)));
+
+    intersect_lines(&mut my_intpoints, &a, &b);
+
+    {
+        let (dx, dy) = line_dx_dy(&a.typ);
+        let len = line_len(&a);
+        for t in (0..=len) {
+            grid[(a.from.0 + dx * t) as usize][(a.from.1 + dy * t) as usize] = true;
+        }
+    }
+    {
+        let (dx, dy) = line_dx_dy(&b.typ);
+        let len = line_len(&b);
+        for t in (0..=len) {
+            grid[(b.from.0 + dx * t) as usize][(b.from.1 + dy * t) as usize] = true;
+        }
+    }
+
+    for j in 0..9 {
+        for i in 0..9 {
+            if my_intpoints.get(&(i, j)).is_some() {
                 print!("x");
-            }
-            else {
-                print!(".");
+            } else {
+                if grid[i as usize][j as usize] {
+                    print!("o");
+                } else {
+                    print!(".");
+                }
             }
         }
         println!("");
@@ -398,48 +449,46 @@ mod tests {
         implement_test(NO, "", parse, solve_part2, 18674);
     }
 } /*
-  0123456789
+    0123456789
 
-  1.1....11.
-  .111...2..
-  ..2.1.111.
-  ...1.2.2..
-  .112313211
-  ...1.2....
-  ..1...1...
-  .1.....1..
-  1.......1.
-  222111....
+    1.1....11.
+    .111...2..
+    ..2.1.111.
+    ...1.2.2..
+    .112313211
+    ...1.2....
+    ..1...1...
+    .1.....1..
+    1.......1.
+    222111....
 
-....x....x
-.........x
-xxxxx....x
-....x....x
-....x....x
-...xxx...x
-....x....x
-....xx..xx
-....x....x
-....x....x
+  ....x....x
+  .........x
+  xxxxx....x
+  ....x....x
+  ....x....x
+  ...xxx...x
+  ....x....x
+  ....xx..xx
+  ....x....x
+  ....x....x
 
-  (2, 2)
-  (7, 1)
-  (5, 3)(7, 3)x
-  (3, 4)(4, 4)(6, 4)(7, 4)
-  (5, 5)
-  (0, 9)(1, 9)(2, 9)
+    (2, 2)
+    (7, 1)
+    (5, 3)(7, 3)x
+    (3, 4)(4, 4)(6, 4)(7, 4)
+    (5, 5)
+    (0, 9)(1, 9)(2, 9)
 
 
-  (5, 9), (7, 5), (7, 9), (8, 9), (6, 4), (9, 9),
-  (9, 4), (4, 9), (0, 4), (2, 3), (5, 5), (6, 9),
-  (3, 9), (0, 9), (8, 4), (7, 8), (2, 4), (3, 4),
-  (2, 1), (5, 4), (7, 4), (2, 0), (4, 4), (2, 9),
-  (1, 9), (5, 3), (2, 2)
+    (5, 9), (7, 5), (7, 9), (8, 9), (6, 4), (9, 9),
+    (9, 4), (4, 9), (0, 4), (2, 3), (5, 5), (6, 9),
+    (3, 9), (0, 9), (8, 4), (7, 8), (2, 4), (3, 4),
+    (2, 1), (5, 4), (7, 4), (2, 0), (4, 4), (2, 9),
+    (1, 9), (5, 3), (2, 2)
 
-  To debug, implement a helper that takes 2 lines
-  prints them out plus the intersections
-  and go through all the cases
+    To debug, implement a helper that takes 2 lines
+    prints them out plus the intersections
+    and go through all the cases
 
-  */
-
-  
+    */
