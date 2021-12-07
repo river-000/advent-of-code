@@ -4,6 +4,7 @@ mod day3;
 mod day4;
 mod day5;
 mod day6;
+mod day7;
 
 use std::time::SystemTime;
 
@@ -24,4 +25,5 @@ fn main() {
     time_it(4,day4::day);
     time_it(5,day5::day);
     time_it(6,day6::day);
+    time_it(7,day7::day);
 }
